@@ -17,6 +17,7 @@ param (
 ### authenticate
 apiauth -vip $vip -username $username -domain $domain
 
+$cluster = api get cluster
 ### check version
 $clusterSoftwareVersion = (api get cluster).clusterSoftwareVersion.SubString(0,3)
 
@@ -68,7 +69,7 @@ foreach ($job in $statsWithoutViewJobs)
     }
 }
 
-Write-Host "Total statistics:"
-Write-Host "DataProtect:  $([math]::Round($totalLocalWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
-Write-Host "CloudArchive: $([math]::Round($totalCloudWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
-Write-Host "DataPlatform: $([math]::Round($platformLicenseTotal/1024/1024/1024)) GiB" -ForegroundColor Yellow
+Write-Host "Cluster $($cluster.name) ($($cluster.id)) Total statistics:"
+Write-Host "DataProtect:  $([math]::Round($totalLocalWrittenBytes/1024/1024/1024)) GiB" 
+Write-Host "CloudArchive: $([math]::Round($totalCloudWrittenBytes/1024/1024/1024)) GiB" 
+Write-Host "DataPlatform: $([math]::Round($platformLicenseTotal/1024/1024/1024)) GiB" 
