@@ -17,6 +17,13 @@ param (
 ### authenticate
 apiauth -vip $vip -username $username -domain $domain
 
+### check version
+$clusterSoftwareVersion = (api get cluster).clusterSoftwareVersion.SubString(0,3)
+
+if ($clusterSoftwareVersion -lt "6.4") {
+    Write-Host "Cluster software needs to be 6.4 or higher to get metrics!" -ForegroundColor Red
+}
+
 ### get platform 
 $nodes = api get /nodes
 $hddCapacity = $nodes.capacityByTier | where-object { $_.storageTier -eq 'SATA-HDD'}
@@ -27,7 +34,7 @@ foreach ($hdd in $hddCapacity)
 }
 
 ### get statistics
-$protectionStats = "api get stats/consumers?allUnderHierarchy=true&consumerType=kProtectionRuns"
+$protectionStats = api get "stats/consumers?allUnderHierarchy=true&consumerType=kProtectionRuns"
 
 # get view protection jobs
 $viewProtectionJobs = api get protectionJobs?allUnderHierarchy=true | where-object { $_.environment -eq 'kView' }
