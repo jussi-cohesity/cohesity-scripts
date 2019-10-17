@@ -61,14 +61,14 @@ foreach ($job in $statsWithoutViewJobs)
     $storageConsumedBytes += $job.stats.storageConsumedBytes
     
     if ($perjobstats -eq 'true') {
-        Write-Host "Protection Job: $($job.name)"
-        Write-Host "DataProtect:  $([math]::Round($job.stats.localDataWrittenBytes/1024/1024/1024)) GiB"
-        Write-Host "CloudArchive: $([math]::Round($job.stats.cloudDataWrittenBytes/1024/1024/1024)) GiB"
+        Write-Host "Protection Job: $($job.name)" -ForegroundColor Yellow
+        Write-Host "DataProtect:  $([math]::Round($job.stats.localDataWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
+        Write-Host "CloudArchive: $([math]::Round($job.stats.cloudDataWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
+        Write-Host "----------------------------------------------"
     }
 }
 
-Write-Host "----------------------------------------------"
 Write-Host "Total statistics:"
-Write-Host "DataProtect:  $([math]::Round($totalLocalWrittenBytes/1024/1024/1024)) GiB"
-Write-Host "CloudArchive: $([math]::Round($totalCloudWrittenBytes/1024/1024/1024)) GiB"
-Write-Host "DataPlatform: $([math]::Round($platformLicenseTotal/1024/1024/1024)) GiB"
+Write-Host "DataProtect:  $([math]::Round($totalLocalWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
+Write-Host "CloudArchive: $([math]::Round($totalCloudWrittenBytes/1024/1024/1024)) GiB" -ForegroundColor Yellow
+Write-Host "DataPlatform: $([math]::Round($platformLicenseTotal/1024/1024/1024)) GiB" -ForegroundColor Yellow
