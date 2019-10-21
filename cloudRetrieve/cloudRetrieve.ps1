@@ -122,17 +122,21 @@ if ($retrieve -eq 'true') {
         }
     }
 
-    if (!$restoreObjects)
-    ### build job retrieve json
-    Write-Host "$(Get-Date -Format "dd.mm.yyyy HH.mm"): Running retrieve job" -ForegroundColor Yellow  
-    $retrieveJson = D@{
-        "glacierRetrievalType" = "kStandard";
-        "restoreObjects" = $restoreObjects;
-        "searchJobUid" = $searchJobUid;
-        "taskName" = "CloudRetrieve_" + $externalTarget + "_" + $((get-date).ToString().Replace('/', '_').Replace(':', '_').Replace(' ', '_'));
-        "vaultId" = $($vault.Id);
+    if (!$restoreObjects) { 
+        Write-Host "$(Get-Date -Format "dd.mm.yyyy HH.mm"): No objects found for restore!" -ForegroundColor Red
+    } else
+    {
+        ### build job retrieve json
+        Write-Host "$(Get-Date -Format "dd.mm.yyyy HH.mm"): Running retrieve job" -ForegroundColor Yellow  
+        $retrieveJson = D@{
+            "glacierRetrievalType" = "kStandard";
+            "restoreObjects" = $restoreObjects;
+            "searchJobUid" = $searchJobUid;
+            "taskName" = "CloudRetrieve_" + $externalTarget + "_" + $((get-date).ToString().Replace('/', '_').Replace(':', '_').Replace(' ', '_'));
+            "vaultId" = $($vault.Id);
+        }
+        $retrieveJson = api post /public/remoteVaults/restoreTasks $retrieveJson
     }
-    $retrieveJson = api post /public/remoteVaults/restoreTasks $retrieveJson
 }
 
 
