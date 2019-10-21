@@ -1,8 +1,8 @@
-### usage: ./cloudRetrieve.ps1 -vip 192.168.1.198 -username admin [ -domain local ] -externalTarget targetname -startDate 'mm/dd/yyyy' -endDate 'mm/dd/yyyy' [-retrieve false] [-storageDomain 'domainanme'] [-jobNames job1,job2,job3]
+### usage: ./cloudRetrieve.ps1 -vip 192.168.1.198 -username admin [ -domain local ] -externalTarget targetname -startDate 'mm/dd/yyyy' -endDate 'mm/dd/yyyy' [-retrieve true] [-storageDomain 'domainanme'] [-jobNames job1,job2,job3]
 
 ### Sample script to do CloudRetrieve - Jussi Jaurola <jussi@cohesity.com>
 
-### If retreive is defined, script will automatically retrieve _latest_ backup from cloud
+### If retrieve is defined, script will automatically retrieve _latest_ backup from cloud
 
 ## process commandline arguments
 [CmdletBinding()]
