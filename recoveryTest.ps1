@@ -69,7 +69,7 @@ foreach ($job in $protectionJobs) {
         }
 
         $cloneVM = Get-CohesityVMwareVM -name $vmList.Name 
-        $taskName = "bTtest-" + $($VM.name) 
+        $taskName = "bTest-" + $($VM.name) 
 
         if (!$cloneVM) {
             Write-Host "Couldnt find VM $($vmList.name). Failing tests. Please check!" -ForegroundColor Red
