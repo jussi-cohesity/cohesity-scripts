@@ -37,7 +37,7 @@ foreach ($stat in $jobStats) {
     $jobBackendSize = [math]::Round($stat.backupJobSummary.totalPhysicalBackupSizeBytes/$units)
     $tenant = $stat.tenants.name
 
-    Write-Host "Job $jobName source size is $jobSourceSize $unit and they consume $jobBackendSize $unit at cluster" -ForegroundColor Yellow
+    Write-Host "Job $jobName source size is $jobSourceSize $unit and it consumes $jobBackendSize $unit at cluster" -ForegroundColor Yellow
 
     if ($export) {
         # Write statistics to csv file
