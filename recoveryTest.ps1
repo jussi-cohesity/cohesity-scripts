@@ -6,7 +6,9 @@
 ### Uses:
 ###     - Cohesity PowerShell module
 ###     - VMware.PowerCLI module
-
+###
+### Create credential files with: Get-Credential | Export-Clixml cred.xml
+###
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster, #the cluster to connect to (DNS name or IP)
