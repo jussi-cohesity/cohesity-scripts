@@ -87,6 +87,9 @@ foreach ($job in $protectionJobs) {
     
 }
 
+### wait 1 minute before next steps
+Start-Sleep 60
+
 ### validate cloned VM(s) status
 foreach ($clone in $clones) {
     $sleepCount = 0
@@ -94,7 +97,7 @@ foreach ($clone in $clones) {
         $validateTask = (Get-CohesityRestoreTask -Id $clone.Id).Status
         $validatePowerOn = (Get-VM -Name $clone.Name -ErrorAction:SilentlyContinue).PowerState
         Write-Host "VM $($clone.Name) clone status is $validateTask and Power Status is $ValidatePowerOn" -ForegroundColor Yellow
-        Start-Sleep 30
+        Start-Sleep 60
 
         if ($validateTask -eq 'kFinished' -and $validatePowerOn -eq 'PoweredOn') {
             break
@@ -102,7 +105,7 @@ foreach ($clone in $clones) {
             Write-Host "Clone of VM $($clone.Name) failed. Failing tests. Other cloned VMs remain cloned status, manual cleanup might needed!" -ForegroundColor Red
             exit
         } else {
-            Start-Sleep 15
+            Start-Sleep 30
             $sleepCount++
         }
     }
