@@ -3,6 +3,9 @@
 ###
 ### Simple backup validation to clone random VMs per job for recovery test - Jussi Jaurola <jussi@cohesity.com>
 ###
+### Uses:
+###     - Cohesity PowerShell module
+###     - VMware.PowerCLI module
 
 [CmdletBinding()]
 param (
