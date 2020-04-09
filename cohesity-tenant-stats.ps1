@@ -2,9 +2,8 @@
 
 ### Example script to get latest backuprun statistics per object - Jussi Jaurola <jussi@cohesity.com>
 
-### Note! 
-### - You need to have cohesity-api.ps1 on same directory!
-### - External vault name should containt tenant name
+### Note! You need to have cohesity-api.ps1 on same directory!
+
 
 ### process commandline arguments
 [CmdletBinding()]
@@ -53,8 +52,7 @@ foreach ($tenant in $tenants) {
 
         $successRuns = $stats.protectionSourceJobRuns.snapshotsInfo | Where-Object runStatus -eq 'kSuccess'
         $lastJobRunTime =  Get-Date (usecsToDate $($successRuns[0].lastRunEndTimeUsecs)) -Format "dd.M.yyy HH.mm:ss"
-
-        $sourceSize = $ts.physicalSizeBytesOnPrimary
+        $sourceSize = $successRuns[0].numLogicalBytesProtected
         $sourceName = $ts.name
 
         $line = "'{0}','{1}','{2}','{3}','{4}','{5}'" -f $tenantId, $customerId, $tenantStorageUsed, $sourceName, $sourceSize, $lastJobRunTime
