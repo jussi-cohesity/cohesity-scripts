@@ -28,13 +28,9 @@ $clusterId = (api get cluster).id
 # Write headers to CSV-file 
 Add-Content -Path $export -Value "'Tenant','CustomerId','Tenant Storage Used','Source name','Source size','Last backup'"
 
-### usecs for dates
-$weekAgo = dateToUsecs (Get-Date -hour 0 -minute 0 -second 0).AddDays(-7)
-$yesterday = dateToUsecs (Get-Date -hour 0 -minute 0 -second 0).AddDays(-1)
-$today = dateToUsecs (Get-Date -hour 0 -minute 0 -second 0)
+$global:sources = api get "/entitiesOfType?acropolisEntityTypes=kVirtualMachine&adEntityTypes=kRootContainer&adEntityTypes=kDomainController&agentEntityTypes=kGroup&agentEntityTypes=kHost&allUnderHierarchy=true&awsEntityTypes=kEC2Instance&awsEntityTypes=kRDSInstance&azureEntityTypes=kVirtualMachine&environmentTypes=kAcropolis&environmentTypes=kAD&environmentTypes=kAWS&environmentTypes=kAgent&environmentTypes=kAzure&environmentTypes=kFlashblade&environmentTypes=kGCP&environmentTypes=kGenericNas&environmentTypes=kGPFS&environmentTypes=kHyperFlex&environmentTypes=kHyperV&environmentTypes=kIsilon&environmentTypes=kKVM&environmentTypes=kNetapp&environmentTypes=kO365&environmentTypes=kPhysical&environmentTypes=kPure&environmentTypes=kView&environmentTypes=kVMware&flashbladeEntityTypes=kFileSystem&gcpEntityTypes=kVirtualMachine&genericNasEntityTypes=kHost&gpfsEntityTypes=kFileset&hyperflexEntityTypes=kServer&hypervEntityTypes=kVirtualMachine&isProtected=true&isilonEntityTypes=kMountPoint&kvmEntityTypes=kVirtualMachine&netappEntityTypes=kVolume&office365EntityTypes=kOutlook&office365EntityTypes=kMailbox&office365EntityTypes=kUsers&office365EntityTypes=kGroups&office365EntityTypes=kSites&office365EntityTypes=kUser&office365EntityTypes=kGroup&office365EntityTypes=kSite&oracleEntityTypes=kDatabase&physicalEntityTypes=kHost&physicalEntityTypes=kWindowsCluster&physicalEntityTypes=kOracleRACCluster&physicalEntityTypes=kOracleAPCluster&pureEntityTypes=kVolume&sqlEntityTypes=kDatabase&viewEntityTypes=kView&viewEntityTypes=kViewBox&vmwareEntityTypes=kVirtualMachine" | select-object id, displayName
 
-$global:sources = api get "/reports/objects/storage"
-$tenants = api get tenants
+$tenants = api get "tenants?properties=Entity"
 $vaults = api get vaults
 
 foreach ($tenant in $tenants) {
@@ -47,16 +43,26 @@ foreach ($tenant in $tenants) {
     $vaultStats = api get "reports/dataTransferToVaults?vaultIds=$($tenantVault.id)"
     $tenantStorageUsed = $vaultStats.dataTransferSummary.storageConsumedBytes
 
-    foreach ($ts in $tenantSources) {
-        $stats = api get "reports/protectionSourcesJobRuns?protectionSourceIds=$($ts.entity.id)&excludeNonRestoreableRuns" 
+    foreach ($entity in $tenant.entityIds) {
+        $source = $sources | Where-Object id -eq $entity
 
-        $successRuns = $stats.protectionSourceJobRuns.snapshotsInfo | Where-Object runStatus -eq 'kSuccess'
-        $lastJobRunTime =  Get-Date (usecsToDate $($successRuns[0].lastRunEndTimeUsecs)) -Format "dd.M.yyy HH.mm:ss"
-        $sourceSize = $successRuns[0].numLogicalBytesProtected
-        $sourceName = $ts.name
+        if ($source) {
+            $sourceName = $source.displayName
+            $stats = api get "reports/protectionSourcesJobRuns?protectionSourceIds=$($ts.entity.id)&excludeNonRestoreableRuns"
 
-        $line = "'{0}','{1}','{2}','{3}','{4}','{5}'" -f $tenantId, $customerId, $tenantStorageUsed, $sourceName, $sourceSize, $lastJobRunTime
-        Add-Content -Path $export -Value $line
+            if ($stats) { 
+                $successRuns = $stats.protectionSourceJobRuns.snapshotsInfo | Where-Object runStatus -eq 'kSuccess'
+                $lastJobRunTime =  Get-Date (usecsToDate $($successRuns[0].jobRunStartTimeUsecs)) -Format "dd.M.yyy HH.mm:ss"
+                $sourceSize = $successRuns[0].numLogicalBytesProtected
 
+                $line = "'{0}','{1}','{2}','{3}','{4}','{5}'" -f $tenantId, $customerId, $tenantStorageUsed, $sourceName, $sourceSize, $lastJobRunTime
+                Add-Content -Path $export -Value $line
+            } else {
+                Add-Content -Path "error.log" -Value "No success runs for $sourceName under tenant $tenantName"
+            }
+        } else {
+            Add-Content -Path "error.log" -Value "Entity $entity is not protected under tenant $tenantName" 
+        }
+         
     }
 }
