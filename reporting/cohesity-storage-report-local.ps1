@@ -1,5 +1,12 @@
 ### Example script to get cluster stats from local clusters - Jussi Jaurola <jussi@cohesity.com
 
+### clusters-file should contain fqdn/vip for connection per line:
+###
+### cluster1.test.local
+### cluster2.my.org
+### cluster3.my.org
+
+
 ### Note! You need to have cohesity-api.ps1 on same directory!
 
 
