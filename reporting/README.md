@@ -1,6 +1,6 @@
 # Introduction
 
-Two example scripts to pull chargeback metrics from both Helios and local cluster. Helios version uses Helios API authentication and local version expects same username and password for each clusters listed in clusterlist.
+Few example scripts to pull chargeback metrics from both Helios and local cluster. Helios version uses Helios API authentication and local version expects same username and password for each clusters listed in clusterlist.
 
 All units are base 2 bytes
 
