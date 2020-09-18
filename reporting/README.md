@@ -4,7 +4,7 @@ Few example scripts to pull chargeback metrics from both Helios and local cluste
 
 All units are base 2 bytes
 
-Both scripts have mandatory export parameter which defines name of csv file used for reporting
+All scripts have mandatory export parameter which defines name of csv file used for reporting
 
 # Additional repository
 
