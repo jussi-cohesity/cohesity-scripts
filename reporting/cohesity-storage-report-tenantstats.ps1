@@ -44,12 +44,20 @@ foreach ($tenant in $tenants) {
     $global:orgStorageConsumedInExternalTarget = 0
     $orgName = $tenant.name
     $orgId = $tenant.tenantId
+    $orgDataIn = 0
+    $orgPhysicalUsedByBackups = 0
 
     Write-Host "Collecting stats for tenant $orgName"
 
     ## Get usage stats for past 
     $stat = api get "/reports/tenantStorage?allUnderHierarchy=true&lastNDays=$days&msecsBeforeEndTime=$mSecsBeforeEndTime&reportType=kStorageConsumedByTenantsReport&tenantIds=$orgId&typeAhead=%7B%7D"
    
+    ### Go trough all Storage Domains and collect stats
+    foreach ($domainStats in $stat.tenantStorageInformation) {
+        $orgDataIn += $domainStats.backupDataInBytes
+        $orgPhysicalUsedByBackups += $domainStats.backupPhysicalSizeBytes
+    }
+    
     $orgDataIn = $stat.tenantStorageInformation.backupDataInBytes
     $orgPhysicalUsedByBackups = $stat.tenantStorageInformation.backupPhysicalSizeBytes
 
