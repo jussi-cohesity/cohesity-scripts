@@ -3,6 +3,7 @@
 ### Capacity reporting example for fetching statistics per organisation - Jussi Jaurola <jussi@cohesity.com
 
 ### Note! You need to have cohesity-api.ps1 on same directory!
+### Requires: Cohesity OS 6.5.1a or later
 
 
 ### process commandline arguments
