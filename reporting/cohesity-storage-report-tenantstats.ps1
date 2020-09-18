@@ -33,6 +33,9 @@ Add-Content -Path $export -Value "Cluster Name, Organsation Id, Organisation Nam
 $date =(Get-Date).AddDays(-$days)
 $startTimeMsecs = [DateTimeOffset]::new($date).ToUnixTimeMilliSeconds()
 
+$timeSpan = New-TimeSpan -Days $days
+$mSecsBeforeEndTime = $timespan.TotalMilliseconds 
+
 ### Get tentants
 Write-Host "Getting tenants..."
 $tenants = api get tenants
@@ -45,8 +48,8 @@ foreach ($tenant in $tenants) {
     Write-Host "Collecting stats for tenant $orgName"
 
     ## Get usage stats for past 
-    $stat = api get "/reports/tenantStorage?allUnderHierarchy=true&lastNDays=$days&reportType=kStorageConsumedByTenantsReport&tenantIds=$orgId&typeAhead=%7B%7D"
-    
+    $stat = api get "/reports/tenantStorage?allUnderHierarchy=true&lastNDays=$days&msecsBeforeEndTime=$mSecsBeforeEndTime&reportType=kStorageConsumedByTenantsReport&tenantIds=$orgId&typeAhead=%7B%7D"
+   
     $orgDataIn = $stat.tenantStorageInformation.backupDataInBytes
     $orgPhysicalUsedByBackups = $stat.tenantStorageInformation.backupPhysicalSizeBytes
 
