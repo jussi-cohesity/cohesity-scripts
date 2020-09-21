@@ -13,7 +13,7 @@ Run these commands from PowerShell to download the script(s) into your current d
 ```powershell
 # Download Commands
 $apiRepoURL = 'https://raw.githubusercontent.com/bseltz-cohesity/scripts/master/powershell'
-$repoURL = 'https://raw.github.com/jussi-cohesity/cohesity-scripts/tree/master/reporting'
+$repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/tree/master/reporting'
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-consumers-report.ps1").content | Out-File "cohesity-storage-consumers-report.ps1"; (Get-Content "cohesity-storage-consumers-report.ps1") | Set-Content "cohesity-storage-consumers-report.ps1"
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-report-helios.ps1").content | Out-File "cohesity-storage-report-helios.ps1"; (Get-Content "cohesity-storage-report-helios.ps1") | Set-Content "cohesity-storage-report-helios.ps1"
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-report-local.ps1").content | Out-File "cohesity-storage-report-local.ps1"; (Get-Content "cohesity-storage-report-local.ps1") | Set-Content "cohesity-storage-report-local.ps1"
