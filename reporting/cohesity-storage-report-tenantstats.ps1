@@ -58,9 +58,6 @@ foreach ($tenant in $tenants) {
         $orgDataIn += $domainStats.backupDataInBytes
         $orgPhysicalUsedByBackups += $domainStats.backupPhysicalSizeBytes
     }
-    
-    $orgDataIn = $stat.tenantStorageInformation.backupDataInBytes
-    $orgPhysicalUsedByBackups = $stat.tenantStorageInformation.backupPhysicalSizeBytes
 
     ## Get CloudArchive stats
     $vaults = api get "vaults?includeMarkedForRemoval=false"
