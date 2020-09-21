@@ -6,7 +6,7 @@ All units are base 2 bytes
 
 All scripts have mandatory export parameter which defines name of csv file used for reporting
 
-## Download the script
+## Download scripts
 
 Run these commands from PowerShell to download the script(s) into your current directory
 
