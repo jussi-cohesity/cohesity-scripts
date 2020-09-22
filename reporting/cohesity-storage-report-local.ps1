@@ -28,6 +28,9 @@ try {
 ### source the cohesity-api helper code 
 . ./cohesity-api.ps1
 
+### Add headers to export-file
+Add-Content -Path $export -Value "Cluster Name, Tenant Name, Tenant StorageDomain(s), Tenant Storage Consumed, Tenant Protected Object, Tenant Protected Capacity"
+
 foreach ($cluster in $clusterlist) {
     Write-Host "Reading stats from cluster $cluster"
 
@@ -43,6 +46,9 @@ foreach ($cluster in $clusterlist) {
     $tenants = api get tenants
 
     foreach ($tenant in $tenants) {
+        $tenantStorageDomain = ""
+        $tenantStorageConsumedBytes = 0
+
         $tenantName = $tenant.name
         $tenantId = $tenant.tenantId
         $tenantId = $tenantId.Substring(0,$tenantId.Length-1)
@@ -53,13 +59,15 @@ foreach ($cluster in $clusterlist) {
         
         $tenantProtectionSources = api get "protectionSources/registrationInfo?includeEntityPermissionInfo=true"
         $tenantProtectedObjects = $tenantProtectionSources.stats.protectedCount
-        $tenantProtectedCapacity = $tenantProtectionSources.stats.protectedSize
+        $tenantProtectedCapacity = [math]::Round(($tenantProtectionSources.stats.protectedSize/1TB),1)
 
         ### Get storagedomain stats
         $storageConsumed = api get "/reports/tenantStorage?allUnderHierarchy=true"
-
-        $tenantStorageDomain = $storageConsumed.tenantStorageInformation.viewBoxName
-        $tenantStorageConsumedBytes =  $storageConsumed.tenantStorageInformation.backupPhysicalSizeBytes
+        
+        foreach ($storageInfo in $storageConsumed.tenantStorageInformation) {
+            $tenantStorageDomain += $storageInfo.viewBoxName + " "
+            $tenantStorageConsumedBytes += [math]::Round(($storageInfo.backupPhysicalSizeBytes),1)
+        }
 
         ### write data 
         $line = "{0},{1},{2},{3},{4},{5}" -f $clusterName, $tenantName, $tenantStorageDomain, $tenantStorageConsumedBytes, $tenantProtectedObjects, $tenantProtectedCapacity
