@@ -66,7 +66,7 @@ foreach ($cluster in $clusterlist) {
         
         foreach ($storageInfo in $storageConsumed.tenantStorageInformation) {
             $tenantStorageDomain += $storageInfo.viewBoxName + " "
-            $tenantStorageConsumedBytes += [math]::Round(($storageInfo.backupPhysicalSizeBytes),1)
+            $tenantStorageConsumedBytes += [math]::Round(($storageInfo.backupPhysicalSizeBytes/1TB),1)
         }
 
         ### write data 
