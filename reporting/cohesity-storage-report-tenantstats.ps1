@@ -12,7 +12,7 @@ param (
     [Parameter(Mandatory = $True)][string]$vip, 
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter()][string]$domain = 'local',
-    [Parameter()][string]$days = '31',
+    [Parameter()][string]$days = 31,
     [Parameter(Mandatory = $true)][string]$export 
     )
 
