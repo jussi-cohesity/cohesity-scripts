@@ -18,6 +18,7 @@ $repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/ma
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-report-helios.ps1").content | Out-File "cohesity-storage-report-helios.ps1"; (Get-Content "cohesity-storage-report-helios.ps1") | Set-Content "cohesity-storage-report-helios.ps1"
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-report-local.ps1").content | Out-File "cohesity-storage-report-local.ps1"; (Get-Content "cohesity-storage-report-local.ps1") | Set-Content "cohesity-storage-report-local.ps1"
 (Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-report-tenantstats.ps1").content | Out-File "cohesity-storage-report-tenantstats.ps1"; (Get-Content "cohesity-storage-report-tenantstats.ps1") | Set-Content "cohesity-storage-report-tenantstats.ps1"
+(Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-stats-tenants.ps1").content | Out-File "cohesity-storage-stats-tenants.ps1"; (Get-Content "cohesity-storage-stats-tenants.ps1") | Set-Content "cohesity-storage-stats-tenants.ps1"
 
 
 (Invoke-WebRequest -Uri "$apiRepoUrl/cohesity-api/cohesity-api.ps1").content | Out-File cohesity-api.ps1; (Get-Content cohesity-api.ps1) | Set-Content cohesity-api.ps1
