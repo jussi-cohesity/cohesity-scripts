@@ -31,6 +31,8 @@ try {
 ### Add headers to export-file
 Add-Content -Path $export -Value "Cluster Name, Tenant Name, Tenant StorageDomain(s), Tenant Storage Consumed, Tenant Protected Object, Tenant Protected Capacity"
 
+
+
 foreach ($cluster in $clusterlist) {
     Write-Host "Reading stats from cluster $cluster"
 
@@ -44,6 +46,16 @@ foreach ($cluster in $clusterlist) {
 
     ### Get tentants
     $tenants = api get tenants
+
+    $tenantStats = api get stats/tenants
+
+    $tenantStorageStats = @{}
+    foreach ($tenantStat in $tenantStats.statsList) {
+        $name = $tenantStat.Name
+        $usage = [math]::Round(($tenantStat.stats.localTotalPhysicalUsageBytes/1TB),1)
+    
+        $tenantStorageStats.add($name, $usage)
+    }
 
     foreach ($tenant in $tenants) {
         $tenantStorageDomain = ""
@@ -66,8 +78,8 @@ foreach ($cluster in $clusterlist) {
         
         foreach ($storageInfo in $storageConsumed.tenantStorageInformation) {
             $tenantStorageDomain += $storageInfo.viewBoxName + " "
-            $tenantStorageConsumedBytes += [math]::Round(($storageInfo.backupPhysicalSizeBytes/1TB),1)
         }
+        $tenantStorageConsumedBytes = $tenantStorageStats[$tenantName]
 
         ### write data 
         $line = "{0},{1},{2},{3},{4},{5}" -f $clusterName, $tenantName, $tenantStorageDomain, $tenantStorageConsumedBytes, $tenantProtectedObjects, $tenantProtectedCapacity
