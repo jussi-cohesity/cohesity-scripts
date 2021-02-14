@@ -23,40 +23,11 @@ try {
     exit
 }
 
-if ($export) {
-    ### Add headers to export-file
-    Add-Content -Path $export -Value "Organsation Id, Protection Group, Source, Data Read (bytes)"
-}
-
 $report = @{}
 
 ### Get mSec time for days 
 $date = [DateTime]::Today.AddHours(23).AddMinutes(59).AddSeconds(59)
 $endTimeMsecs = [DateTimeOffset]::new($date).ToUnixTimeMilliSeconds()
-
-Write-Host "Collecting stats for non-Tenant sources"
-$jobs = api get "data-protect/protection-groups?isDeleted=false&includeTenants=false&includeLastRunInfo=true&environments=kPhysical" -v2
-foreach ($job in $jobs.protectionGroups) {
-    $jobName = $job.name
-    $jobId = $job.id.split(':')[2]
-    Write-Host "        Collecting stats for Protection Group $($job.name)"
-    $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=true
-    foreach ($run in $runs) {
-        if ($run.backupRun.snapshotsDeleted -eq $false) {
-            foreach($source in $run.backupRun.sourceBackupStatus) {
-                $sourcename = $source.source.name
-                if($sourcename -notin $report.Keys) {
-                    $report[$sourcename] = @{}
-                    $report[$sourcename]['organisationId'] = "SP"
-                    $report[$sourcename]['protectionGroup'] = $jobName
-                    $report[$sourcename]['size'] = 0
-                }
-                $report[$sourcename]['size'] += $source.stats.totalBytesReadFromSource
-            }                    
-        }
-    }
-}
-
 
 Write-Host "Collecting stats for tenants"
 $tenants = api get tenants
@@ -85,9 +56,10 @@ foreach ($tenant in $tenants) {
                             $report[$sourcename]['organisationId'] = $tenantId
                             $report[$sourcename]['protectionGroup'] = $jobName
                             $report[$sourcename]['size'] = 0
+                            $report[$sourcename]['lastBackupTimeStamp'] = usecsToDate ($source.stats.startTimeUsecs)
                             
                         }
-                        $report[$sourcename]['size'] += $source.stats.totalBytesReadFromSource
+                        $report[$sourcename]['size'] += [math]::Round($source.stats.totalBytesReadFromSource/1GB)
                     }
                 }
             }
@@ -98,8 +70,28 @@ foreach ($tenant in $tenants) {
 ### Export data
 if ($export) {
     $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
-        $line = "{0},{1},{2},{3}" -f $_.Value.organisationId, $_.Value.protectionGroup, $_.Name, $_.Value.size
-        Add-Content -Path $export -Value $line
+        ### Build JSON
+        $exportJsonContent = @{
+            "timestamp" =  $_.Value.lastBackupTimeStamp;                             
+            "resourceId" = $null;               
+            "resourceClass" = "AGENT_BASED_BACKUP";
+            "resourceName" = $_.Name;
+            "customer" = @{
+                "customerClass" = "ESC";
+                "tenantId" = $_.Value.organisationId;
+                "businessGroupId" =  $null;
+                "businessGroupName" = $null;
+            }
+            "resource" = @{
+                "lifecycle_state" = "UPDATED";
+                "datacenter" =  $null;
+                "serviceClass" = $null;
+                "datastoreUsage" = @{
+                    "size" = $_.Value.size;
+                    "unit" = "GB";
+                }
+            }
+        }
+    $exportJsonContent | ConvertTo-Json | Add-Content $export
     }
-
 }
