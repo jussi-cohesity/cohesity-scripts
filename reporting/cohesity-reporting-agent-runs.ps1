@@ -95,4 +95,4 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Obje
     }
 }
 
-$exportJsonContent | ConvertTo-Json | Set-Content $export
+$exportJsonContent | ConvertTo-Json -Depth 9 | Set-Content $export
