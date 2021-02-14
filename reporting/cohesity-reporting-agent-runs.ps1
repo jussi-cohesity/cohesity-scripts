@@ -9,7 +9,7 @@ param (
     [Parameter(Mandatory = $True)][string]$vip, 
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter()][string]$domain = 'local',
-    [Parameter()][string]$export 
+    [Parameter(Mandatory = $True)][string]$export 
     )
 
 ### source the cohesity-api helper code 
@@ -68,30 +68,28 @@ foreach ($tenant in $tenants) {
 }
 
 ### Export data
-if ($export) {
-    $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
-        ### Build JSON
-        $exportJsonContent = @{
-            "timestamp" =  $_.Value.lastBackupTimeStamp;                             
-            "resourceId" = $null;               
-            "resourceClass" = "AGENT_BASED_BACKUP";
-            "resourceName" = $_.Name;
-            "customer" = @{
-                "customerClass" = "ESC";
-                "tenantId" = $_.Value.organisationId;
-                "businessGroupId" =  $null;
-                "businessGroupName" = $null;
-            }
-            "resource" = @{
-                "lifecycle_state" = "UPDATED";
-                "datacenter" =  $null;
-                "serviceClass" = $null;
-                "datastoreUsage" = @{
-                    "size" = $_.Value.size;
-                    "unit" = "GB";
-                }
+$report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
+    ### Build JSON
+    $exportJsonContent = @{
+        "timestamp" =  $_.Value.lastBackupTimeStamp;                             
+        "resourceId" = $null;               
+        "resourceClass" = "AGENT_BASED_BACKUP";
+        "resourceName" = $_.Name;
+        "customer" = @{
+            "customerClass" = "ESC";
+            "tenantId" = $_.Value.organisationId;
+            "businessGroupId" =  $null;
+            "businessGroupName" = $null;
+        }
+        "resource" = @{
+            "lifecycle_state" = "UPDATED";
+            "datacenter" =  $null;
+            "serviceClass" = $null;
+            "datastoreUsage" = @{
+                "size" = $_.Value.size;
+                "unit" = "GB";
             }
         }
-    $exportJsonContent | ConvertTo-Json | Add-Content $export
     }
+    $exportJsonContent | ConvertTo-Json | Add-Content $export
 }
