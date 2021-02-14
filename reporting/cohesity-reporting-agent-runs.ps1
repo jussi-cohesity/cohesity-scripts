@@ -68,9 +68,11 @@ foreach ($tenant in $tenants) {
 }
 
 ### Export data
+$exportJsonContent = @()
+
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
     ### Build JSON
-    $exportJsonContent = @{
+    $exportJsonContent += @{
         "timestamp" =  $_.Value.lastBackupTimeStamp;                             
         "resourceId" = $null;               
         "resourceClass" = "AGENT_BASED_BACKUP";
@@ -91,5 +93,6 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Obje
             }
         }
     }
-    $exportJsonContent | ConvertTo-Json | Add-Content $export
 }
+
+$exportJsonContent | ConvertTo-Json | Set-Content $export
