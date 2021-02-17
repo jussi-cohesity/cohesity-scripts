@@ -8,6 +8,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$vip, 
     [Parameter(Mandatory = $True)][string]$username,
+    [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "MB",
     [Parameter(Mandatory = $true)][string]$export 
     )
 
@@ -23,10 +24,10 @@ try {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Cluster Name, Tenant Name, Protection Group, Environment Type, Data In, Data In After Dedupe, Local Data Written, Cloud Data Written, Storage Consumed"
+Add-Content -Path $export -Value "Cluster Name, Tenant Name, Protection Group, Environment Type, Data In ($unit), Data In After Dedupe ($unit), Local Data Written ($unit), Cloud Data Written ($unit), Storage Consumed ($unit)"
 
 ### Get usage stats
-
+$units = "1" + $unit
 $stats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
 
 foreach ($stat in $stats.statsList) {
@@ -35,11 +36,11 @@ foreach ($stat in $stats.statsList) {
     $tenantName = $stat.groupList.tenantName
     $environment = $stat.protectionEnvironment
 
-    $dataIn = $stat.stats.dataInBytes
-    $dataInDeduped = $stat.stats.dataInBytesAfterDedup
-    $localDataWritten = $stat.stats.localDataWrittenBytes
-    $cloudDataWritten = $stat.stats.cloudDataWrittenBytes
-    $storageConsumed = $stat.stats.storageConsumedBytes
+    $dataIn = $stat.stats.dataInBytes/$units
+    $dataInDeduped = $stat.stats.dataInBytesAfterDedup/$units
+    $localDataWritten = $stat.stats.localDataWrittenBytes/$units
+    $cloudDataWritten = $stat.stats.cloudDataWrittenBytes/$units
+    $storageConsumed = $stat.stats.storageConsumedBytes/$units
 
     ### write data 
     $line = "{0},{1},{2},{3},{4},{5},{6},{7},{8}" -f $clusterName, $tenantName, $jobName, $environment, $dataIn, $dataInDeduped, $localDataWritten, $cloudDataWritten, $storageConsumed
