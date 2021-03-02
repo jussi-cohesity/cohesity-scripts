@@ -41,7 +41,7 @@ foreach ($tenant in $tenants) {
     
     apiauth -vip $vip -username $username -tenantId $tenantId
 
-    $jobs = api get "data-protect/protection-groups?isDeleted=false&includeTenants=true&includeLastRunInfo=true&environments=kPhysical" -v2
+    $jobs = api get "data-protect/protection-groups?isDeleted=false&includeTenants=true&includeLastRunInfo=true&environments=kSQL" -v2
     foreach ($job in $jobs.protectionGroups) {
         $jobName = $job.name
         $jobId = $job.id.split(':')[2]
@@ -59,7 +59,7 @@ foreach ($tenant in $tenants) {
                             $report[$sourcename]['lastBackupTimeStamp'] = usecsToDate ($source.stats.startTimeUsecs)
                             
                         }
-                        $report[$sourcename]['size'] += [math]::Round($source.stats.totalBytesReadFromSource/1GB)
+                        $report[$sourcename]['size'] += $source.stats.totalBytesReadFromSource
                     }
                 }
             }
@@ -73,7 +73,7 @@ $exportJsonContent = @()
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
     ### Build JSON
     $exportJsonContent += @{
-        "timestamp" =  $_.Value.lastBackupTimeStamp;                             
+        "timestamp" = $_.Value.lastBackupTimeStamp.ToString();                             
         "resourceId" = $null;               
         "resourceClass" = "AGENT_BASED_BACKUP";
         "resourceName" = $_.Name;
