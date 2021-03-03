@@ -54,6 +54,7 @@ foreach ($tenant in $tenants) {
                         if($sourcename -notin $report.Keys){
                             $report[$sourcename] = @{}
                             $report[$sourcename]['organisationId'] = $tenantId
+                            $report[$sourcename]['organisationName'] = $tenantName
                             $report[$sourcename]['protectionGroup'] = $jobName
                             $report[$sourcename]['size'] = 0
                             $report[$sourcename]['lastBackupTimeStamp'] = usecsToDate ($source.stats.startTimeUsecs)
@@ -76,10 +77,11 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Obje
         "timestamp" = $_.Value.lastBackupTimeStamp.ToString();                             
         "resourceId" = $null;               
         "resourceClass" = "AGENT_BASED_BACKUP";
-        "resourceName" = $_.Name;
+        "FQDN" = $_.Name;
+        "resourceName" = $null;
         "customer" = @{
             "customerClass" = "ESC";
-            "tenantId" = $_.Value.organisationId;
+            "tenantId" = $_.Value.organisationName;
             "businessGroupId" =  $null;
             "businessGroupName" = $null;
         }
