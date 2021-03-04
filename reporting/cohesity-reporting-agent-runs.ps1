@@ -71,7 +71,7 @@ foreach ($tenant in $tenants) {
 ### Export data
 $exportJsonContent = @()
 
-$report.GetEnumerator() | Sort-Object -Property {$_.Value.tenant} | ForEach-Object {
+$report.GetEnumerator() | Sort-Object -Property {$_.Value.organisationName} | ForEach-Object {
     ### Build JSON
     $exportJsonContent += @{
         "timestamp" = $_.Value.lastBackupTimeStamp.ToString();                             
