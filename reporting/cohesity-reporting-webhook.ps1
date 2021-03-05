@@ -7,7 +7,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter()][string]$domain = 'local',
-    [Parameter(Mandatory = $True)][string]$export.
+    [Parameter(Mandatory = $True)][string]$export,
     [object] $webHookData
     )
 
