@@ -50,6 +50,7 @@ if ($webHookData) {
     $run = api get "data-protect/protection-groups/$clusterId`:$incarnatiomnId`:$jobId/runs/$jobId`:$runId`?includeObjectDetails=true" -v2
 
     $tenantName = $run.permissions.name
+    $tenantId = $run.permissions.id
     
     foreach($source in $run.objects) {
         $sourcename = $source.object.name
