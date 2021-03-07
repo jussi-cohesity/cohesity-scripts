@@ -52,6 +52,7 @@ if ($webHookData) {
     $tenantName = $run.permissions.name
     $tenantId = $run.permissions.id
     $tenantId = $tenantId.Substring(0,$tenantId.Length-1)
+    $jobName = $run.protectionGroupName
     
     foreach($source in $run.objects) {
         $sourcename = $source.object.name
@@ -59,6 +60,7 @@ if ($webHookData) {
             $report[$sourcename] = @{}
             $report[$sourcename]['organisationId'] = $tenantId
             $report[$sourcename]['organisationName'] = $tenantName
+            $report[$sourcename]['protectionGroup'] = $jobName
             $report[$sourcename]['size'] = 0
             $report[$sourcename]['lastBackupTimeStamp'] = usecsToDate ($source.localSnapshotInfo.snapshotInfo.startTimeUsecs)
         }
