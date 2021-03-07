@@ -51,6 +51,7 @@ if ($webHookData) {
 
     $tenantName = $run.permissions.name
     $tenantId = $run.permissions.id
+    $tenantId = $tenantId.Substring(0,$tenantId.Length-1)
     
     foreach($source in $run.objects) {
         $sourcename = $source.object.name
