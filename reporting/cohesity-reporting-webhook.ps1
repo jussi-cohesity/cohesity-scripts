@@ -47,7 +47,7 @@ if ($webHookData) {
 
     Write-Host "Collecting stats for job's $jobId run $runId"
   
-    $run = api get "data-protect/protection-groups/$clusterId`:$incarnatiomnId`:$jobId/runs/$jobId`:$runId`?includeObjectDetails=true" -v2
+    $run = api get "data-protect/protection-groups/$clusterId`:$incarnationId`:$jobId/runs/$jobId`:$runId`?includeObjectDetails=true" -v2
 
     $tenantName = $run.permissions.name
     $tenantId = $run.permissions.id
