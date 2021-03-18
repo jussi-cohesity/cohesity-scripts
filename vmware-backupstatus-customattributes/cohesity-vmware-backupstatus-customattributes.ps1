@@ -50,9 +50,11 @@ foreach ($source in $sources) {
 ## Change attributes
 
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Object {
+    $vm = $_.Name
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
-        df
+        Set-Annotation -Entity $vm -CustomAttribute "Last Backup Status" -Value $_.lastRunStatus
+        Set-Annotation -Entity $vm -CustomAttribute "Last Backup TimeStamp" -Value $_.lastRunTimeStamp
     } else {
         ### Connect to VMware vCenter
         $vmwareCredential = Import-Clixml -Path ($vmwareCred)
@@ -65,7 +67,4 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
             exit
         }
     }
-    
-
-
 }
