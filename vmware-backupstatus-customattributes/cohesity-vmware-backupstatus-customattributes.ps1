@@ -57,7 +57,7 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     if ($_.Value.vCenter -eq $connectedVcenter) {
 
         $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
-        Set-VM $VM -Notes $notes
+        Set-VM $VM -Notes $notes -Confirm:$False
 
     } else {
         ### Connect to VMware vCenter
@@ -71,5 +71,6 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
             exit
         }
     }
-  
+    
+
 }
