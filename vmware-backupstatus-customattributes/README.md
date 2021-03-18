@@ -1,8 +1,6 @@
-# Cohesity VMware VM backup status info to notes field
+# Cohesity VMware VM backup status info to Custom Attributes
 
-This is an example powershell script to update VMware VM's notes field to include info of latest backup runs
-
-NOTE!! THIS SCRIPT WILL REPLACE CONTENT OF VM'S NOTES FIELD!
+This is an example powershell script to update VMware VM's Custom Attributes to include info of latest backup runs
 
 # Prerequisites
 
@@ -25,6 +23,8 @@ Note: Secure XML files can only be decrypted by the user account that created th
 
 ## Usage
 ./cohesity-vmware-backupstatus-customattributes.ps1 -cohesityCluster 192.168.1.198 -cohesityCred 'cohesity_credentials.xml' -vmwareCred 'vmware_credentials.xml' 
+
+![image](https://user-images.githubusercontent.com/56082924/111673739-f1639400-8823-11eb-8dae-82d14b5145e7.png)
 
 
 # Notes
