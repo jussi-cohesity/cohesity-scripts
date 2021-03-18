@@ -1,6 +1,6 @@
-# Cohesity VMware VM backup status info to custom attributes
+# Cohesity VMware VM backup status info to notes field
 
-This is an example powershell script to update VMware VM's Customattributes to include info of latest backup runs
+This is an example powershell script to update VMware VM's notes field to include info of latest backup runs
 
 # Prerequisites
 
