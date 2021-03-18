@@ -55,9 +55,9 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     $vm = $_.Name
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
-
+        ### Set notes
         $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
-        Set-VM $VM -Notes $notes -Confirm:$False -RunAsync
+        Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
 
     } else {
         ### Connect to VMware vCenter
@@ -65,11 +65,15 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
         try {
             Connect-VIServer -Server $($_.Value.vCenter) -Credential $vmwareCredential
             Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
-            $connectedVcenter = $($global:DefaultVIServer.Name)
+            $connectedVcenter = $_.Value.vCenter
         } catch {
             write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Yellow
             exit
         }
+
+        ### Set notes
+        $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
+        Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
     }
     
 
