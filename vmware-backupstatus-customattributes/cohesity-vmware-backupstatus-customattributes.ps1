@@ -79,9 +79,9 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
         $lastBackupTimeStampAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup TimeStamp"}).Key
         $lastRunJobNameAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup ProtectionGroup"}).Key
 
-        if (!$lastRunStatusAttribute) { New-CustomAttribute -Name "Cohesity Last Backup Status" -TargetName VirtualMachine }
-        if (!$lastBackupTimeStampAttribute) { New-CustomAttribute -Name "Cohesity Last Backup TimeStamp" -TargetName VirtualMachine }
-        if (!$lastRunJobNameAttribute) { New-CustomAttribute -Name "Cohesity Last Backup ProtectionGroup" -TargetName VirtualMachine }
+        if (!$lastRunStatusAttribute) { New-CustomAttribute -Name "Cohesity Last Backup Status" -TargetType VirtualMachine }
+        if (!$lastBackupTimeStampAttribute) { New-CustomAttribute -Name "Cohesity Last Backup TimeStamp" -TargetType VirtualMachine }
+        if (!$lastRunJobNameAttribute) { New-CustomAttribute -Name "Cohesity Last Backup ProtectionGroup" -TargetType VirtualMachine }
         
 
         ### Set notes
