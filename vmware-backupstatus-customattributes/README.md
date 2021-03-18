@@ -1,4 +1,4 @@
-# Cohesity VMware backup restore test validation example
+# Cohesity VMware VM backup status info to custom attributes
 
 This is an example powershell script to update VMware VM's Customattributes to include info of latest backup runs
 
