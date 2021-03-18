@@ -56,9 +56,11 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
 
+        ### Set notes
         Write-Host "Updating $vm notes field"
-        $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
-        Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup Status" -Value $($_.Value.lastRunStatus)
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup TimeStamp" -Value $($_.Value.lastRunTimeStamp)
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup ProtectionGroup" -Value $($_.Value.lastRunJobName)
 
     } else {
         ### Connect to VMware vCenter
@@ -72,9 +74,21 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
             exit
         }
 
+        ## Check if Custom Attributes are created, if not add them
+        $lastRunStatusAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup Status"}).Key
+        $lastBackupTimeStampAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup TimeStamp"}).Key
+        $lastRunJobNameAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup ProtectionGroup"}).Key
+
+        if (!$lastRunStatusAttribute) { New-CustomAttribute -Name "Cohesity Last Backup Status" -TargetName VirtualMachine }
+        if (!$lastBackupTimeStampAttribute) { New-CustomAttribute -Name "Cohesity Last Backup TimeStamp" -TargetName VirtualMachine }
+        if (!$lastRunJobNameAttribute) { New-CustomAttribute -Name "Cohesity Last Backup ProtectionGroup" -TargetName VirtualMachine }
+        
+
         ### Set notes
         Write-Host "Updating $vm notes field"
-        $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
-        Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup Status" -Value $($_.Value.lastRunStatus)
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup TimeStamp" -Value $($_.Value.lastRunTimeStamp)
+        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup ProtectionGroup" -Value $($_.Value.lastRunJobName)
+        
     }
 }
