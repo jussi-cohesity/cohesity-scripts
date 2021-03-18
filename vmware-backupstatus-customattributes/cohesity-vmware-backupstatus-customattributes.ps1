@@ -42,7 +42,9 @@ foreach ($source in $sources) {
             $report[$sourcename] = @{}
             $report[$sourcename]['lastRunStatus'] = $lastRunStatus
             $report[$sourcename]['lastRunTimeStamp'] = $lastRunTimeStamp
+            $report[$sourcename]['lastRunJobName'] = $lastrun.jobName
             $report[$sourcename]['vCenter'] = $sourceParent.name
+
         }
     }
 }
@@ -53,18 +55,21 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     $vm = $_.Name
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
-        Set-Annotation -Entity $vm -CustomAttribute "Last Backup Status" -Value $_.lastRunStatus
-        Set-Annotation -Entity $vm -CustomAttribute "Last Backup TimeStamp" -Value $_.lastRunTimeStamp
+
+        $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
+        Set-VM $VM -Notes $notes
+
     } else {
         ### Connect to VMware vCenter
         $vmwareCredential = Import-Clixml -Path ($vmwareCred)
         try {
-            Connect-VIServer -Server $vmwareEnvironment -Credential $vmwareCredential
+            Connect-VIServer -Server $($_.Value.vCenter) -Credential $vmwareCredential
             Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
             $connectedVcenter = $($global:DefaultVIServer.Name)
         } catch {
-            write-host "Cannot connect to VMware vCenter $($vmwareEnvironment)" -ForegroundColor Yellow
+            write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Yellow
             exit
         }
     }
+  
 }
