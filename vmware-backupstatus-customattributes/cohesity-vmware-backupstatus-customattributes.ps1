@@ -55,7 +55,8 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     $vm = $_.Name
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
-        ### Set notes
+
+        Write-Host "Updating $vm notes field"
         $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
         Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
 
@@ -72,9 +73,8 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
         }
 
         ### Set notes
+        Write-Host "Updating $vm notes field"
         $notes = "`r`n"+"Last Backup Status: $($_.Value.lastRunStatus)"+"`r`n"+"Last Backup TimeStamp: $($_.Value.lastRunTimeStamp)"+"`r`n"+"Last Backup Protection Group: $($_.Value.lastRunJobName)"
         Set-VM $VM -Notes $notes -Confirm:$False -RunAsync | Out-File lastrun_log.txt
     }
-    
-
 }
