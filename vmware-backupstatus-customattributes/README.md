@@ -2,6 +2,8 @@
 
 This is an example powershell script to update VMware VM's notes field to include info of latest backup runs
 
+NOTE!! THIS SCRIPT WILL REPLACE CONTENT OF VM'S NOTES FIELD!
+
 # Prerequisites
 
 * [PowerShell](https://aka.ms/getps6)
