@@ -60,7 +60,7 @@ for tenant in sorted(tenants):
                             report[sourcename]['protectionGroup'] = jobName
                             report[sourcename]['size'] = 0
                             report[sourcename]['lastBackupTimeStamp'] = usecsToDate(source['stats']['startTimeUsecs'])
-                        report[sourcename]['size'] += source['stats']['totalBytesReadFromSource']
+                        report[sourcename]['size'] += source['stats'].get('totalBytesReadFromSource',0)
 
 f = codecs.open(outputfile, 'w', 'utf-8')
 
