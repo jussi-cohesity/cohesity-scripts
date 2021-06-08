@@ -58,5 +58,5 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
     $vm = $_.Name
     
     $line = "{0},{1},{2},{3},{4}" -f $_.Value.vCenter, $_.Value.lastRunJobName, $vm, $_.Value.lastRunStatus, $_.Value.lastRunTimeStamp
-    Add-Content -Path $export -Value 
+    Add-Content -Path $export -Value $line
 }
