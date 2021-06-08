@@ -2,7 +2,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster, #the cluster to connect to (DNS name or IP)
     [Parameter(Mandatory = $True)][string]$cohesityCred, #credentials file for cohesity
-    [Parameter(Mandatory = $True)][string]$vmwareCred #credentials file for cohesity
+    [Parameter(Mandatory = $True)][string]$export 
 )
 
 Write-Host "Importing credentials from credential file $($cohesityCred)" -ForegroundColor Yellow
@@ -24,7 +24,7 @@ Write-Host "Getting VMware Object protection statusinfo"
 $report = @{}
 
 $protectionSourceObjects = Get-CohesityProtectionSourceObject KVMware
-$sources = $protectionSourceObjects | Where-Object { $_.vmWareProtectionSource.type -eq 'kVirtualMachine' }
+$sources = $protectionSourceObjects | Where-Object { $_.vmWareProtectionSource.type -eq 'kVirtualMachine' -and $_.vmWareProtectionSource.hostType -eq 'kLinux' }
 
 foreach ($source in $sources) {
     $lastrun = Get-CohesityProtectionJobrun -Sourceid ($source.id) -numruns 1
@@ -49,10 +49,14 @@ foreach ($source in $sources) {
     }
 }
 
-## Change attributes
+## Export content
+
 
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Object {
     $vm = $_.Name
+    
+    $line = "{0},{1},{2},{3},{4},{5}" -f $clusterName, $tenantName, $tenantStorageDomain, $tenantStorageConsumedBytes, $tenantProtectedObjects, $tenantProtectedCapacity
+    Add-Content -Path $export -Value $line
     
     if ($_.Value.vCenter -eq $connectedVcenter) {
 
