@@ -18,7 +18,7 @@ try {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "vCenter Name, Protection Group, VM Name, Last Run Status, Last Run TimeStamp"
+Add-Content -Path $export -Value "'vCenter Name', 'Protection Group', 'VM Name', 'Last Run Status', 'Last Run TimeStamp'"
 
 
 ### Search VMware objects protected
@@ -57,6 +57,6 @@ foreach ($source in $sources) {
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Object {
     $vm = $_.Name
     
-    $line = "{0},{1},{2},{3},{4}" -f $_.Value.vCenter, $_.Value.lastRunJobName, $vm, $_.Value.lastRunStatus, $_.Value.lastRunTimeStamp
+    $line = "'{0}','{1}','{2}','{3}','{4}'" -f $_.Value.vCenter, $_.Value.lastRunJobName, $vm, $_.Value.lastRunStatus, $_.Value.lastRunTimeStamp
     Add-Content -Path $export -Value $line
 }
