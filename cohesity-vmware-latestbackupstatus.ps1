@@ -17,6 +17,10 @@ try {
     exit
 }
 
+### Add headers to export-file
+Add-Content -Path $export -Value "vCenter Name, Protection Group, VM Name, Last Run Status, Last Run TimeStamp"
+
+
 ### Search VMware objects protected
 
 Write-Host "Getting VMware Object protection statusinfo"
@@ -55,9 +59,10 @@ foreach ($source in $sources) {
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Object {
     $vm = $_.Name
     
-    $line = "{0},{1},{2},{3},{4},{5}" -f $clusterName, $tenantName, $tenantStorageDomain, $tenantStorageConsumedBytes, $tenantProtectedObjects, $tenantProtectedCapacity
-    Add-Content -Path $export -Value $line
+    $line = "{0},{1},{2},{3},{4},{5}" -f $
+    Add-Content -Path $export -Value 
     
+    vCenter Name, Protection Group, VM Name, Last Run Status, Last Run TimeStamp"
     if ($_.Value.vCenter -eq $connectedVcenter) {
 
         ### Set notes
