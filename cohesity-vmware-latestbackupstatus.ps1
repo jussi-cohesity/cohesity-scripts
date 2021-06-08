@@ -54,50 +54,9 @@ foreach ($source in $sources) {
 }
 
 ## Export content
-
-
 $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Object {
     $vm = $_.Name
     
-    $line = "{0},{1},{2},{3},{4},{5}" -f $
+    $line = "{0},{1},{2},{3},{4}" -f $_.Value.vCenter, $_.Value.lastRunJobName, $vm, $_.Value.lastRunStatus, $_.Value.lastRunTimeStamp
     Add-Content -Path $export -Value 
-    
-    vCenter Name, Protection Group, VM Name, Last Run Status, Last Run TimeStamp"
-    if ($_.Value.vCenter -eq $connectedVcenter) {
-
-        ### Set notes
-        Write-Host "Updating $vm notes field"
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup Status" -Value $($_.Value.lastRunStatus)
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup TimeStamp" -Value $($_.Value.lastRunTimeStamp)
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup ProtectionGroup" -Value $($_.Value.lastRunJobName)
-
-    } else {
-        ### Connect to VMware vCenter
-        $vmwareCredential = Import-Clixml -Path ($vmwareCred)
-        try {
-            Connect-VIServer -Server $($_.Value.vCenter) -Credential $vmwareCredential
-            Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
-            $connectedVcenter = $_.Value.vCenter
-        } catch {
-            write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Yellow
-            exit
-        }
-
-        ## Check if Custom Attributes are created, if not add them
-        $lastRunStatusAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup Status"}).Key
-        $lastBackupTimeStampAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup TimeStamp"}).Key
-        $lastRunJobNameAttribute = (Get-CustomAttribute | Where-Object {$_.Name -eq "Cohesity Last Backup ProtectionGroup"}).Key
-
-        if (!$lastRunStatusAttribute) { New-CustomAttribute -Name "Cohesity Last Backup Status" -TargetType VirtualMachine }
-        if (!$lastBackupTimeStampAttribute) { New-CustomAttribute -Name "Cohesity Last Backup TimeStamp" -TargetType VirtualMachine }
-        if (!$lastRunJobNameAttribute) { New-CustomAttribute -Name "Cohesity Last Backup ProtectionGroup" -TargetType VirtualMachine }
-        
-
-        ### Set notes
-        Write-Host "Updating $vm notes field"
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup Status" -Value $($_.Value.lastRunStatus)
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup TimeStamp" -Value $($_.Value.lastRunTimeStamp)
-        Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup ProtectionGroup" -Value $($_.Value.lastRunJobName)
-        
-    }
 }
