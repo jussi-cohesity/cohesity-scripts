@@ -1,6 +1,6 @@
 ### Example script to get license usages from helios - Jussi Jaurola <jussi@cohesity.com>
 
-### Note! You need to have cohesity-api.ps1 on same directory!
+### Note! You need to have cohesity-api.ps1 on same directory! Units listed are GiB (Valid up to 6.6.0b release)
 
 ### process commandline arguments
 [CmdletBinding()]
