@@ -27,8 +27,16 @@ try {
 Write-Host "Refreshing source $protectionSource. This could take long. Please wait!" -ForegroundColor Yellow
 ### Get source & Refresh source
 $source = Get-CohesityProtectionSource -Environments kO365 | Where { $_.protectionSource.name -match $protectionSource }
+if (!$source) { 
+    Write-Host "Couldn't find source with name $protectionSource, please check!" -ForegroundColor Red
+}
 $lastRefresh = $source.registrationInfo.refreshTimeUsecs
-Update-CohesityProtectionSource -Id $($source.protectionSource.id)
+try {
+    Update-CohesityProtectionSource -Id $($source.protectionSource.id)
+} catch {
+    Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
+}
+
 
 
 ### List all objects
