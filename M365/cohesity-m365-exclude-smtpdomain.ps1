@@ -55,7 +55,7 @@ foreach ($object in $availableObjects) {
 
 ### Get protectiongroup
 
-Write-Host "Gettig information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
+Write-Host "Getting information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
 $job = Get-CohesityProtectionJob -Names $protectionGroup
 $jobSourceIds = $job.sourceIds
 
