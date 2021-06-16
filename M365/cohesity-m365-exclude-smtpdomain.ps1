@@ -20,7 +20,7 @@ try {
     Connect-CohesityCluster -Server $cohesityCluster -Credential $Credential
     Write-Host "Connected to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
 } catch {
-    write-host "Cannot connect to Cohesity cluster $($cohesityCluster)" -ForegroundColor Yellow
+    write-host "Cannot connect to Cohesity cluster $($cohesityCluster)" -ForegroundColor Red
     exit
 }
 
@@ -32,7 +32,7 @@ Update-CohesityProtectionSource -Id $($source.protectionSource.id)
 
 
 ### List all objects
-Write-Host "Getting objects for source $protectionSource"
+Write-Host "Getting objects for source $protectionSource" -ForegroundColor Yellow
 $availableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -notmatch $($excludeDomain) }
 
 if (!$availableObjects) {
