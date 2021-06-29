@@ -84,7 +84,7 @@ $report.GetEnumerator() | Sort-Object -Property {$_.Value.vCenter} | ForEach-Obj
         
 
         ### Set notes
-        Write-Host "Updating $vm notes field"
+        Write-Host "Updating $vm attributes"
         Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup Status" -Value $($_.Value.lastRunStatus)
         Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup TimeStamp" -Value $($_.Value.lastRunTimeStamp)
         Set-Annotation -Entity $vm -CustomAttribute "Cohesity Last Backup ProtectionGroup" -Value $($_.Value.lastRunJobName)
