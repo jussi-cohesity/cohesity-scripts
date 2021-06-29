@@ -17,35 +17,34 @@ try {
     exit
 }
 
-### Search VMware objects protected
-
-Write-Host "Getting VMware Object protection statusinfo"
 
 $report = @{}
 
+### Search VMware objects protected
 $protectionSourceObjects = Get-CohesityProtectionSourceObject KVMware
-$sources = $protectionSourceObjects | Where-Object { $_.vmWareProtectionSource.type -eq 'kVirtualMachine' }
+Write-Host "Getting VMware Protection Groups..."
 
-foreach ($source in $sources) {
-    $lastrun = Get-CohesityProtectionJobrun -Sourceid ($source.id) -numruns 1
+$jobs = Get-CohesityProtectionJob -Environments KVMware | Select-Object Id,Name
+
+foreach ($job in $jobs) {
+    Write-Host "Collecting all objects for Protection Group $($job.name)"
+    $lastrun = Get-CohesityProtectionJobRun -JobId $($job.id) -ExcludeNonRestoreableRuns -NumRuns 1
     if ($lastrun) {
-        $sourceName = $source.name
-        Write-Host "Getting details for $sourceName"
-
-        $lastRunStatus = $lastrun.backupRun.status
-        $lastRunStartUsecs = Convert-CohesityUsecsToDateTime -usecs ($lastrun.backupRun.stats.startTimeUsecs)
-        $lastRunTimeStamp = $lastRunStartUsecs.dateTime
-        $sourceParent = $protectionSourceObjects | Where-Object { $_.id -eq $source.parentId }
-
-        
-        if($sourceName -notin $report.Keus) {
-            $report[$sourcename] = @{}
-            $report[$sourcename]['lastRunStatus'] = $lastRunStatus
-            $report[$sourcename]['lastRunTimeStamp'] = $lastRunTimeStamp
-            $report[$sourcename]['lastRunJobName'] = $lastrun.jobName
-            $report[$sourcename]['vCenter'] = $sourceParent.name
-
-        }
+        foreach ($source in $lastrun.backupRun.sourceBackupStatus) {
+            $sourceName = $source.source.name
+            Write-Host "   Getting details for object $sourceName"
+            $lastRunStatus = $source.status
+            $lastRunTimeStamp = Convert-CohesityUsecsToDateTime -Usecs $source.stats.startTimeUsecs
+            $sourceParent = $protectionSourceObjects | Where-Object { $_.id -eq $source.source.parentId }
+            
+            if($sourceName -notin $report.Keys) {
+                $report[$sourcename] = @{}
+                $report[$sourcename]['lastRunStatus'] = $lastRunStatus
+                $report[$sourcename]['lastRunTimeStamp'] = $lastRunTimeStamp
+                $report[$sourcename]['lastRunJobName'] = $job.name
+                $report[$sourcename]['vCenter'] = $sourceParent.name
+            }
+        }    
     }
 }
 
