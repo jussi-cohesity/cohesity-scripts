@@ -2,8 +2,6 @@
 
 ### Note! You need to have cohesity-api.ps1 on same directory!
 
-### Data values are in TIB base2
-
 ### process commandline arguments
 [CmdletBinding()]
 param (
@@ -19,7 +17,7 @@ param (
 try {
     apiauth -helios -password $apikey
 } catch {
-    write-host "Cannot connect to Helios. Please check the apikey!" -ForegroundColor Yellow
+    write-host "Cannot connect to Helios. Please check the apikey!" -ForegroundColor Red
     exit
 }
 
@@ -31,6 +29,8 @@ $units = "1" + $unit
 $clusters = $HELIOSCONNECTEDCLUSTERS.name
 foreach ($cluster in $clusters) {
     ## Conenct to cluster
+    Write-Host "Connecting to cluster $cluster" -ForegroundColor Yellow
+
     heliosCluster $cluster
     
     $stats = api get "stats/consumers?maxCount=10000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
@@ -38,6 +38,8 @@ foreach ($cluster in $clusters) {
     foreach ($stat in $stats.statsList) {
 
         $jobname = $stat.name
+        Write-Host "    Collecting stats for $jobname" -ForegroundColor Yellow
+
         $tenantName = $stat.groupList.tenantName
         $environment = $stat.protectionEnvironment
 
@@ -45,7 +47,7 @@ foreach ($cluster in $clusters) {
         $archiveStorageConsumed = $stat.stats.localDataWrittenBytes/$units
 
         ### write data 
-        $line = "{0},{1},{2},{3},{4}" -f $clusterName, $tenantName, $jobName, $environment, $localStorageConsumed, $archiveStorageConsumed
+        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $archiveStorageConsumed
         Add-Content -Path $export -Value $line
     }
 }
