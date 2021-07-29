@@ -44,7 +44,7 @@ foreach ($cluster in $clusters) {
         $environment = $stat.protectionEnvironment
 
         $localStorageConsumed = $stat.stats.storageConsumedBytes/$units
-        $archiveStorageConsumed = $stat.stats.localDataWrittenBytes/$units
+        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
 
         ### write data 
         $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $archiveStorageConsumed
