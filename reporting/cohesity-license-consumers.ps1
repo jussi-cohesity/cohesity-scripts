@@ -1,4 +1,4 @@
-### Example script to get cluster stats from helios - Jussi Jaurola <jussi@cohesity.com>
+### Example script to get estimate for license consumers from helios - Jussi Jaurola <jussi@cohesity.com>
 
 ### Note! You need to have cohesity-api.ps1 on same directory!
 
