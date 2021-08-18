@@ -22,7 +22,7 @@ try {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Cluster Name, Tenant Name, Protection Group, Environment Type, Local Storage Consumed ($unit), Archive Storage Consumed ($unit)"
+Add-Content -Path $export -Value "Cluster Name, Tenant Name, Protection Group, Environment Type, Local Storage Written ($unit), Archive Storage Written ($unit)"
 
 $units = "1" + $unit
 
@@ -43,7 +43,7 @@ foreach ($cluster in $clusters) {
         $tenantName = $stat.groupList.tenantName
         $environment = $stat.protectionEnvironment
 
-        $localStorageConsumed = $stat.stats.storageConsumedBytes/$units
+        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
         $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
 
         ### write data 
