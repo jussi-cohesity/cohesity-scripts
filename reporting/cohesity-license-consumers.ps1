@@ -22,7 +22,7 @@ try {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Cluster Name, Tenant Name, Protection Group, Environment Type, Local Storage Written ($unit), Archive Storage Written ($unit)"
+Add-Content -Path $export -Value "Cluster Name, Tenant Name, Consumer, Environment Type, DataPlatform Used ($unit), DataProtect Used ($unit), CloudArchive Used ($unit)"
 
 $units = "1" + $unit
 
@@ -33,9 +33,11 @@ foreach ($cluster in $clusters) {
 
     heliosCluster $cluster
     
-    $stats = api get "stats/consumers?maxCount=10000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
+    $backupStats = api get "stats/consumers?maxCount=10000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
+    $viewStats = api get "stats/consumers?msecsBeforeCurrentTimeToCompare=604800000&maxCount=10000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionPolicy=true&fetchProtectionEnvironment=true&consumerType=kViews"
+    $replicationStats = api get "stats/consumers?msecsBeforeCurrentTimeToCompare=604800000&maxCount=10000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionPolicy=true&fetchProtectionEnvironment=true&consumerType=kReplicationRuns"
 
-    foreach ($stat in $stats.statsList) {
+    foreach ($stat in $backupStats.statsList) {
 
         $jobname = $stat.name
         Write-Host "    Collecting stats for $jobname" -ForegroundColor Yellow
@@ -47,7 +49,44 @@ foreach ($cluster in $clusters) {
         $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
 
         ### write data 
-        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $archiveStorageConsumed
+        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $localStorageConsumed, $archiveStorageConsumed
         Add-Content -Path $export -Value $line
     }
+    
+    foreach ($stat in $viewStats.statsList) {
+        
+        $dataProtectUsed = 0
+        
+        $consumerName = $stat.name
+        Write-Host "    Collecting stats for $jobname" -ForegroundColor Yellow
+        
+        $tenantName = $stat.groupList.tenantName
+        $environment = $stat.groupList.consumer.type
+        
+        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
+        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
+        
+        ### write data 
+        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $consumerName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
+        Add-Content -Path $export -Value $line
+    }
+    
+    foreach ($stat in $replicationStats.statsList) {
+
+        $dataProtectUsed = 0
+        
+        $jobname = $stat.name
+        Write-Host "    Collecting stats for $jobname" -ForegroundColor Yellow
+
+        $tenantName = $stat.groupList.tenantName
+        $environment = $stat.protectionEnvironment
+
+        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
+        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
+
+        ### write data 
+        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
+        Add-Content -Path $export -Value $line
+    }
+    
 }
