@@ -49,7 +49,7 @@ foreach ($cluster in $clusters) {
         $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
 
         ### write data 
-        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $localStorageConsumed, $archiveStorageConsumed
+        $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $localStorageConsumed, $archiveStorageConsumed
         Add-Content -Path $export -Value $line
     }
     
@@ -67,7 +67,7 @@ foreach ($cluster in $clusters) {
         $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
         
         ### write data 
-        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $consumerName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
+        $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $consumerName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
         Add-Content -Path $export -Value $line
     }
     
@@ -85,7 +85,7 @@ foreach ($cluster in $clusters) {
         $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
 
         ### write data 
-        $line = "{0},{1},{2},{3},{4}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
+        $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
         Add-Content -Path $export -Value $line
     }
     
