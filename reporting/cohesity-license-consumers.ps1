@@ -25,9 +25,9 @@ try {
 Add-Content -Path $export -Value "Cluster Name, Tenant Name, Consumer, Environment Type, DataPlatform Used ($unit), DataProtect Used ($unit), CloudArchive Used ($unit)"
 
 $units = "1" + $unit
+$clusters = heliosClusters | Select-Object -Property name
 
-$clusters = $HELIOSCONNECTEDCLUSTERS.name
-foreach ($cluster in $clusters) {
+foreach ($cluster in $clusters.name) {
     ## Conenct to cluster
     Write-Host "Connecting to cluster $cluster" -ForegroundColor Yellow
 
