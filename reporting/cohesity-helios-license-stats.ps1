@@ -25,8 +25,8 @@ $globalLicenseUsages = @{}
 ### Add headers to export-file
 Add-Content -Path $export -Value "Cluster, dataPlatform, cloudArchive, cloudTier, cloudSpin, dataProtect"
 
-$clusters = $HELIOSCONNECTEDCLUSTERS.name
-foreach ($cluster in $clusters) {
+$clusters = heliosClusters | Select-Object -Property name
+foreach ($cluster in $clusters.name) {
     ## Connect to cluster
     Write-Host "Collecting license usage for cluster $cluster"
     heliosCluster $cluster
