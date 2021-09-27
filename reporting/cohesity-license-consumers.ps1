@@ -45,8 +45,8 @@ foreach ($cluster in $clusters) {
         $tenantName = $stat.groupList.tenantName
         $environment = $stat.protectionEnvironment
 
-        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
-        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
+        $localStorageConsumed = [math]::Round($stat.stats.localDataWrittenBytes/$units, 2)
+        $archiveStorageConsumed = [math]::Round($stat.stats.cloudTotalPhysicalUsageBytes/$units, 2)
 
         ### write data 
         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $localStorageConsumed, $archiveStorageConsumed
@@ -63,8 +63,8 @@ foreach ($cluster in $clusters) {
         $tenantName = $stat.groupList.tenantName
         $environment = $stat.groupList.consumer.type
         
-        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
-        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
+        $localStorageConsumed = [math]::Round($stat.stats.localDataWrittenBytes/$units, 2)
+        $archiveStorageConsumed = [math]::Round($stat.stats.cloudTotalPhysicalUsageBytes/$units, 2)
         
         ### write data 
         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $consumerName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
@@ -81,8 +81,8 @@ foreach ($cluster in $clusters) {
         $tenantName = $stat.groupList.tenantName
         $environment = $stat.protectionEnvironment
 
-        $localStorageConsumed = $stat.stats.localDataWrittenBytes/$units
-        $archiveStorageConsumed = $stat.stats.cloudTotalPhysicalUsageBytes/$units
+        $localStorageConsumed = [math]::Round($stat.stats.localDataWrittenBytes/$units, 2)
+        $archiveStorageConsumed = [math]::Round($stat.stats.cloudTotalPhysicalUsageBytes/$units, 2)
 
         ### write data 
         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $cluster, $tenantName, $jobName, $environment, $localStorageConsumed, $dataProtectUsed, $archiveStorageConsumed
