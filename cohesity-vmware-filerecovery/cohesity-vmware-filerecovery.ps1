@@ -12,6 +12,8 @@ Write-Host "Importing credentials from credential file $($cohesityCred)" -Foregr
 Write-Host "Connecting to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
 
 $Credential = Import-Clixml -Path ($cohesityCred)
+$TargetHostCredentials = Import-Clixml -Path ($serverCred)
+
 try {
     Connect-CohesityCluster -Server $cohesityCluster -Credential $Credential
     Write-Host "Connected to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
@@ -36,4 +38,4 @@ $protectionSourceParentId = $protectionSource.RegisteredSource.id
 
 # Recover file
 
-Restore-CohesityFile -TaskName $taskName -FileNames $filename -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $serverCred
+Restore-CohesityFile -TaskName $taskName -FileNames $filename -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $TargetHostCredentials
