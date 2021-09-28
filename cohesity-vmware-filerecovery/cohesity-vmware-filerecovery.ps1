@@ -46,7 +46,7 @@ $sleepCount = 0
 
 While ($true) {
     $validateTask = (Get-CohesityRestoreTask -Id $restoreTask.Id).Status
-    Write-Host "Current status for recovery job is $validateTask"
+    Write-Host "Current status for recovery job is $validateTask" -ForegroundColor Yellow
 
     if ($validateTask -eq 'kFinished') {
         break
