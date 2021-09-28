@@ -37,7 +37,7 @@ $protectionSourceHostType = $protectionSource.SnapshottedSource.VmWareProtection
 $protectionSourceParentId = $protectionSource.RegisteredSource.id
 
 # Recover file
-$restoreTask = Restore-CohesityFile -TaskName $taskName -FileNames $filename -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $TargetHostCredentials
+$restoreTask = Restore-CohesityFile -TaskName $taskName -FileNames $filename -NewBaseDirectory $newdir -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $TargetHostCredentials
 Write-Host "Running recovery test for file $filename to server $server" -ForegroundColor Yellow
 
 # Wait 1 minute
