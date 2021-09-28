@@ -24,7 +24,7 @@ try {
 
 # Find protection group for file and server
 
-$protectionSource = Find-CohesityObjectsForRestore -Search $server -Environments kVMware | Where { $_.ObjectName -eq $server } | Select-Object -First 1
+$protectionSource = Find-CohesityObjectsForRestore -Search $server -Environments kVMware | Where { $_.ObjectName -eq $server } | Select-Object -First 1
 if (!$protectionSource) {
     Write-Host "Cannot find protection source for server $server" -ForegroundColor Red
     exit
@@ -37,5 +37,24 @@ $protectionSourceHostType = $protectionSource.SnapshottedSource.VmWareProtection
 $protectionSourceParentId = $protectionSource.RegisteredSource.id
 
 # Recover file
+$restoreTask = Restore-CohesityFile -TaskName $taskName -FileNames $filename -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $TargetHostCredentials
+Write-Host "Running recovery test for file $filename to server $server" -ForegroundColor Yellow
 
-Restore-CohesityFile -TaskName $taskName -FileNames $filename -JobId $protectionSourceJobId -SourceId $protectionSourceId -TargetSourceId $protectionSourceId -TargetParentSourceId $protectionSourceParentId -TargetHostTYpe $protectionSourceHostType -TargetHostCredential $TargetHostCredentials
+# Wait 1 minute
+Start-Sleep 15
+$sleepCount = 0
+
+While ($true) {
+    $validateTask = (Get-CohesityRestoreTask -Id restoreTask.Id).Status
+    Write-Host "Current status for recovery job is $validateTask"
+
+    if ($validateTask -eq 'kFinished') {
+        break
+    } elseif ($sleepCount -gt '10') {
+        Write-Host "Restore takes too long. Failing tests!" -ForegroundColor Red
+        exit
+    } else {
+        Start-Sleep 30
+        $sleepCount++
+    }
+}
