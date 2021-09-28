@@ -22,7 +22,7 @@ Get-Credential | Export-Clixml cohesity_credentials.xml
 Note: Secure XML files can only be decrypted by the user account that created them.
 
 ## Usage
-./cohesity-vmware-filerecovery.ps1 -cohesity -cohesityCluster 192.168.1.198 -cohesityCred 'cohesity_credentials.xml' -serverCred 'vmware_credentials.xml' -filename '/C/data/file.txt' -newdir '/C/temp/recovery/' -server 'windows-virtual'
+./cohesity-vmware-filerecovery.ps1 -cohesity -cohesityCluster 192.168.1.198 -cohesityCred 'cohesity_credentials.xml' -serverCred 'vmware_credentials.xml' -filename '/C/data/file.txt' -newdir 'C:/temp/recovery/' -server 'windows-virtual'
 
 
 # Notes
