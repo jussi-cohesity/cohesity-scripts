@@ -15,13 +15,9 @@ Run these commands from PowerShell to download the both chargeback script, and a
 ```powershell
 # Download Commands
 $apiRepoURL = 'https://raw.githubusercontent.com/bseltz-cohesity/scripts/master/powershell'
-$repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/reporting'
-(Invoke-WebRequest -Uri "$repoUrl/cohesity-storage-consumers-report.ps1").content | Out-File "cohesity-storage-consumers-report.ps1"; (Get-Content "cohesity-storage-consumers-report.ps1") | Set-Content "cohesity-storage-consumers-report.ps1"
+$repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/reporting/cohesity-license-consumers'
+(Invoke-WebRequest -Uri "$repoUrl/cohesity-license-consumers.ps1").content | Out-File "cohesity-license-consumers.ps1"; (Get-Content "cohesity-license-consumers.ps1") | Set-Content "cohesity-license-consumers.ps1"
 
 (Invoke-WebRequest -Uri "$apiRepoUrl/cohesity-api/cohesity-api.ps1").content | Out-File cohesity-api.ps1; (Get-Content cohesity-api.ps1) | Set-Content cohesity-api.ps1
 # End Download Commands
 ```
-
-# Additional repository
-
-These scripts are using Brian Seltzer's cohesity-api.ps1. You can get it and guide to it from he's repository; https://github.com/bseltz-cohesity/scripts/tree/master/powershell
