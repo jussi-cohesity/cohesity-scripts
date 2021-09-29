@@ -2,6 +2,11 @@
 
 Example script to pull pay-per-use license consumption per protection group and tenant. Script uses Helios API key for authentication.
 
+# Prerequisites
+
+* [PowerShell](https://aka.ms/getps6)
+* [Cohesity PowerShell Module](https://cohesity.github.io/cohesity-powershell-module/#/)
+
 ## Setup
 
 ### Create Helios API Key
@@ -20,4 +25,20 @@ $repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/ma
 
 (Invoke-WebRequest -Uri "$apiRepoUrl/cohesity-api/cohesity-api.ps1").content | Out-File cohesity-api.ps1; (Get-Content cohesity-api.ps1) | Set-Content cohesity-api.ps1
 # End Download Commands
+```
+
+## Usage
+./cohesity-license-consumers.ps1 -apikey xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx -export license-consumers-report.csv 
+
+
+# Notes
+Jussi Jaurola - <jussi@cohesity.com>
+```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 ```
