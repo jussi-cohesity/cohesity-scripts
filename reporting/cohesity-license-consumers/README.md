@@ -28,7 +28,7 @@ $repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/ma
 ```
 
 ## Usage
-./cohesity-license-consumers.ps1 -apikey xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx -export license-consumers-report.csv 
+./cohesity-license-consumers.ps1 -apikey xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx -export license-consumers-report.csv [-unit MB|GB|TB]
 
 
 # Notes
