@@ -41,7 +41,7 @@ foreach ($job in $jobs.protectionGroups) {
   $jobName = $job.name
   $jobId = $job.id.split(':')[2]
   Write-Host "Collecting stats for Protection Group $($job.name)" -ForegroundColor Yellow
-    $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=true
+    $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=false
     foreach ($run in $runs) {
         if ($run.backupRun.snapshotsDeleted -eq $false) {
             foreach($source in $run.backupRun.sourceBackupStatus) {
