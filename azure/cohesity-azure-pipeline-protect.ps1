@@ -43,20 +43,18 @@ $applicationObject = Get-CohesityProtectionSourceObject -Environments KHyperV | 
 
 ### Create job to protect application
 Write-Host "Protecting application $application"
-New-CohesityProtectionJob -Name $application -PolicyName $policyName -SourceIds $($applicationObject.Id) -StorageDomainName 'DefaultStorageDomain' -Environment KHyperV -ParentSourceId $($applicationObject.ParentId)
+$applicationProtectionJob = New-CohesityProtectionJob -Name $application -PolicyName $policyName -SourceIds $($applicationObject.Id) -StorageDomainName 'DefaultStorageDomain' -Environment KHyperV -ParentSourceId $($applicationObject.ParentId)
 
 ### Find DB to protect
 Write-Host "Finding protectionSourceObject for $database"
 $databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-Object { $_.name -match $database } | Select-Object -First 1
 
-### Create job to protect application
+### Create job to protect database
 Write-Host "Protecting database $database"
-New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.Id) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
+$databaseProtectionJob = New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.Id) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
 
 ### Run Protection Jobs
 Write-Host "Running protection groups for $application and $database"
-$applicationProtectionJob = Get-CohesityProtectionJob -Names $application
-$databaseProtectionJob = Get-CohesityProtectionJob -Names $database
 Get-CohesityProtectionJob -Names $application | Start-CohesityProtectionJob -RunType KFull
 Get-CohesityProtectionJob -Names $database | Start-CohesityProtectionJob -RunType KFull
 
