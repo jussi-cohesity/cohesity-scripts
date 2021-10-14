@@ -5,7 +5,7 @@ Example script to pull pay-per-use license consumption per protection group and 
 # Prerequisites
 
 * [PowerShell](https://aka.ms/getps6)
-* [Cohesity PowerShell Module](https://cohesity.github.io/cohesity-powershell-module/#/)
+* [Cohesity PowerShell API toolkit](https://github.com/bseltz-cohesity/scripts/tree/master/powershell/cohesity-api)
 
 ## Setup
 
@@ -15,7 +15,7 @@ Login to Helios, and ensure you have All Clusters selected from top menu. Go to 
 
 ### Download scripts
 
-Run these commands from PowerShell to download the both chargeback script, and api-helper script into your current directory
+Run these commands from PowerShell to download the both chargeback script, and api-helper script into your current directory. To be able to run script you need to have both scripts on same directory.
 
 ```powershell
 # Download Commands
