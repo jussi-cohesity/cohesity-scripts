@@ -33,6 +33,7 @@ Get-CohesityProtectionSource -Environments kSQL | ForEach-Object { Update-Cohesi
 
 
 ### Create protection policy for object
+$storageDomain = Get-CohesityStorageDomain -Names DefaultStorageDomain
 $policyName = "pipeline-" + $application + "-" + $database
 Write-Host "Creating Protection Policy for application $application"
 $policy = New-CohesityProtectionPolicy -PolicyName $policyName -BackupInHours 14 -RetainInDays $retainDays -Confirm:$false
@@ -51,7 +52,7 @@ $databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-
 
 ### Create job to protect database
 Write-Host "Protecting database $database"
-$databaseProtectionJob = New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.Id) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
+$databaseProtectionJob = New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.ParentId) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
 
 ### Run Protection Jobs
 Write-Host "Running protection groups for $application and $database"
@@ -67,7 +68,7 @@ While ($true) {
     $statusDatabaseRun = (Get-CohesityProtectionJobRun -JobName $database)[0].backupRun.status
 
     Write-Host "Current status of application protection group is $statusApplicationRun"
-    Write-Host "Current status of application protection group is $statusDatabaseRun"
+    Write-Host "Current status of database protection group is $statusDatabaseRun"
 
     if ($statusApplicationRun -eq 'kSuccess') -and ($statusDatabaseRun -eq 'kSuccess'){
         break
