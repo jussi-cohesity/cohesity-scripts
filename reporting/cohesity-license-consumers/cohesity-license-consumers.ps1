@@ -6,7 +6,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $True)][string]$apikey,
-    [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "MB",
+    [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "TB",
     [Parameter(Mandatory = $true)][string]$export 
     )
 
