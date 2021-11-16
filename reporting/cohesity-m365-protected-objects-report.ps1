@@ -1,6 +1,6 @@
 ### Example script to report protected M365 source sizes - Jussi Jaurola <jussi@cohesity.com>
 
-### Note! You need to have cohesity-api.ps1 on same directory! Script exports each clusters audit data to separate file to be sent to Cohesity
+### Note! You need to have cohesity-api.ps1 on same directory! 
 
 ### process commandline arguments
 [CmdletBinding()]
