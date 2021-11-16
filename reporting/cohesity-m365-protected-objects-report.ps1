@@ -19,18 +19,19 @@ try {
     exit
 }
 
-### Get audit report
 $clusters = (heliosClusters).name
 
 foreach ($cluster in $clusters) {
-    ## Conenct to cluster
+    ## Connect to cluster
     Write-Host "Connecting to cluster $cluster" -ForegroundColor Yellow
     
     heliosCluster $cluster
 
+    Write-Host "   Getting sources for cluster $cluster" -ForegroundColor Yellow
     $sources = api get protectionSources?environments=kO365
 
     foreach($source in $sources) {
+        Write-Host "     Collecting data for source $($source.protectionSource.name)" -ForegroundColor Yellow
         $protectedObjects = api get "protectionSources/protectedObjects?id=$($source.protectionSource.id)&environment=kO365"
         $users = $protectedObjects | Where { $_.protectionSource.office365ProtectionSource.type -eq 'kUser'}
         $sites = $protectedObjects | Where { $_.protectionSource.office365ProtectionSource.type -eq 'kSite'}
