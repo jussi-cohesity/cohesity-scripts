@@ -39,24 +39,28 @@ foreach ($cluster in $clusters) {
 
         ### Collect Exchange and OneDrive sizes for each user
         $report = @{}
-        foreach($user in $users) {
-            $username = $($user.protectionSource.office365ProtectionSource.primarySMTPAddress)
-            $customername = (($user.protectionJobs[0]).name).split(" - ")[0]
-            $report[$username] = @{}
-            $report[$username]['mailboxSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.mailboxSize)
-            $report[$username]['oneDriveSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.oneDriveSize)  
-            $report[$username]['oneDriveGroupName'] = ($user.protectionJobs | Where { $_.name -match 'Onedrive' }).name
-            $report[$username]['exchangeGroupName'] = ($user.protectionJobs | Where { $_.name -match 'Mailbox' }).name
-            $report[$username]['customername'] = $customername
+        if ($users) {
+            foreach($user in $users) {
+                $username = $($user.protectionSource.office365ProtectionSource.primarySMTPAddress)
+                $customername = (($user.protectionJobs[0]).name).split(" - ")[0]
+                $report[$username] = @{}
+                $report[$username]['mailboxSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.mailboxSize)
+                $report[$username]['oneDriveSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.oneDriveSize)  
+                $report[$username]['oneDriveGroupName'] = ($user.protectionJobs | Where { $_.name -match 'Onedrive' }).name
+                $report[$username]['exchangeGroupName'] = ($user.protectionJobs | Where { $_.name -match 'Mailbox' }).name
+                $report[$username]['customername'] = $customername
+            }
         }
 
-        foreach ($site in $sites) {
-            $sitename = $($site.protectionSource.name)
-            $customername = ($site.protectionJobs.name).split("-")[0]
-            $report[$sitename] = @{}
-            $report[$sitename]['siteGroupName'] = $($site.protectionJobs.name)
-            $report[$sitename]['siteSize'] = $($site.stats.protectedSize)
-            $report[$sitename]['customername'] = $customername
+        if ($sites) {
+            foreach ($site in $sites) {
+                $sitename = $($site.protectionSource.name)
+                $customername = ($site.protectionJobs.name).split("-")[0]
+                $report[$sitename] = @{}
+                $report[$sitename]['siteGroupName'] = $($site.protectionJobs.name)
+                $report[$sitename]['siteSize'] = $($site.stats.protectedSize)
+                $report[$sitename]['customername'] = $customername
+            }
         }
     }
 }
