@@ -20,6 +20,7 @@ try {
 }
 
 $clusters = (heliosClusters).name
+$report = @{}
 
 foreach ($cluster in $clusters) {
     ## Connect to cluster
@@ -38,7 +39,6 @@ foreach ($cluster in $clusters) {
         $teams = $protectedObjects | Where { $_.protectionSource.office365ProtectionSource.type -eq 'kTeam'}
 
         ### Collect Exchange and OneDrive sizes for each user
-        $report = @{}
         if ($users) {
             foreach($user in $users) {
                 $username = $($user.protectionSource.office365ProtectionSource.primarySMTPAddress)
