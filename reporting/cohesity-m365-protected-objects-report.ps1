@@ -41,7 +41,7 @@ foreach ($cluster in $clusters) {
         $report = @{}
         foreach($user in $users) {
             $username = $($user.protectionSource.office365ProtectionSource.primarySMTPAddress)
-            $customername = (($user.protectionJobs | Where { $_.name -match 'Mailbox' }).name).split(" - ")[0]
+            $customername = (($user.protectionJobs[0]).name).split(" - ")[0]
             $report[$username] = @{}
             $report[$username]['mailboxSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.mailboxSize)
             $report[$username]['oneDriveSize'] = $($user.protectionSource.office365ProtectionSource.userInfo.oneDriveSize)  
