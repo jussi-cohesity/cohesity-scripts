@@ -4,7 +4,8 @@
 param (
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter(Mandatory = $true)][string]$password,
-    [Parameter(Mandatory = $true)][string]$cohesityCluster
+    [Parameter(Mandatory = $true)][string]$cohesityCluster,
+    [Parameter()][switch]$runNow
     )
 
 Get-Module -ListAvailable -Name Cohesity* | Import-Module
@@ -21,4 +22,8 @@ $jobArray = "JOBNAME_12months", "JOBNAME_6monts", "JOBNAME_1month"
 foreach ($job in $jobArray) {
     Write-Host "Resuming job $job"
     Resume-CohesityProtectionJob -Name $job
+    
+    if ($runNow) { 
+        Start-CohesityProtectionJob -Name $job
+    }
 }
