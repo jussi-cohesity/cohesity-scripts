@@ -1,6 +1,6 @@
 ### Example script to report protected M365 source sizes - Jussi Jaurola <jussi@cohesity.com>
 
-### Note! You need to have cohesity-api.ps1 on same directory! 
+### Note! You need to have cohesity-api.ps1 on same directory! Script exports each clusters audit data to separate file to be sent to Cohesity
 
 ### process commandline arguments
 [CmdletBinding()]
@@ -21,7 +21,6 @@ try {
 
 $clusters = (heliosClusters).name
 $report = @{}
-
 foreach ($cluster in $clusters) {
     ## Connect to cluster
     Write-Host "Connecting to cluster $cluster" -ForegroundColor Yellow
@@ -62,16 +61,27 @@ foreach ($cluster in $clusters) {
                 $report[$sitename]['customername'] = $customername
             }
         }
+
+        if ($teams) {
+            foreach ($team in $teams) {
+                $sitename = $($team.protectionSource.name)
+                $customername = ($team.protectionJobs.name).split("-")[0]
+                $report[$sitename] = @{}
+                $report[$sitename]['teamGroupName'] = $($team.protectionJobs.name)
+                $report[$sitename]['teamSize'] = $($team.stats.protectedSize)
+                $report[$sitename]['customername'] = $customername
+            }
+        }
     }
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Customer, Consumer, Exchange Protection Group, Exchange Size, OneDrive Protection Group, OneDrive Size, Sites Protection Group Name, Sites Size"
+Add-Content -Path $export -Value "Customer, Consumer, Exchange Protection Group, Exchange Size, OneDrive Protection Group, OneDrive Size, Sites Protection Group Name, Sites Size, Team Protection Group Name, Team Size"
 
 ### Export data
 Write-Host "Exporting data..." -ForegroundColor Yellow
 
 $report.GetEnumerator() | Sort-Object -Property {$_.Name} | ForEach-Object {
-    $line = "{0},{1},{2},{3},{4},{5},{6},{7}" -f $_.Value.customername, $_.Name, $_.Value.exchangeGroupName, $_.Value.mailboxSize, $_.Value.oneDriveGroupName, $_.Value.oneDriveSize, $_.Value.siteGroupName, $_.Value.siteSize
+    $line = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}" -f $_.Value.customername, $_.Name, $_.Value.exchangeGroupName, $_.Value.mailboxSize, $_.Value.oneDriveGroupName, $_.Value.oneDriveSize, $_.Value.siteGroupName, $_.Value.siteSize, $_.Value.teamGroupName, $_.Value.teamSize
     Add-Content -Path $export -Value $line
 }
