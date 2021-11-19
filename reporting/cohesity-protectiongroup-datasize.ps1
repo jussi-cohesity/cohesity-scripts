@@ -6,7 +6,8 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $True)][string]$apikey,
-    [Parameter(Mandatory = $True)][string]$export
+    [Parameter(Mandatory = $True)][string]$export,
+    [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "GB"
     )
 
 ### source the cohesity-api helper code 
@@ -19,6 +20,7 @@ try {
     exit
 }
 
+$units = "1" + $unit
 $clusters = (heliosClusters).name
 $report = @{}
 
@@ -41,7 +43,7 @@ foreach ($cluster in $clusters) {
         if($jobName -notin $report.Keys) {
             $report[$jobName] = @{
                 'customer' = $customerName
-                'dataInBytes' = $($stat.stats.dataInBytes)
+                'dataIn' = [math]::Round(($stat.stats.dataInBytes/$units), 2)
             }
         }
     }
@@ -54,6 +56,6 @@ Add-Content -Path $export -Value "Customer, Consumer, Data Size"
 Write-Host "Exporting data..." -ForegroundColor Yellow
 
 $report.GetEnumerator() | Sort-Object -Property {$_.Name} | ForEach-Object {
-    $line = "{0},{1},{2}" -f $_.Value.customer, $_.Name, $_.Value.dataInBytes
+    $line = "{0},{1},{2}" -f $_.Value.customer, $_.Name, $_.Value.dataIn
     Add-Content -Path $export -Value $line
 }
