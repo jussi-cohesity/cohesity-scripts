@@ -300,8 +300,7 @@ $reportContent=@"
 
 <hr>
 
-<big><big><big><b>Total Numbers</b></big></big></big><br>
-<b>Total Users: </b>$UserLicensesRequired<br>
+<big><big><big><b>Total Storage Numbers</b></big></big></big><br>
 <b>First Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].firstYearTotalUsage) $unit<br>
 <b>Second Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].secondYearTotalUsage) $unit<br>
 <b>Third Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].thirdYearTotalUsage) $unit<br>
