@@ -1,5 +1,7 @@
 ### Example script to collect M365 usage details - Jussi Jaurola <jussi@cohesity.com>
 
+## Due Microsoft API this script will ask you authenticate to M365 twice
+
 ### process commandline arguments
 [CmdletBinding()]
 param (
@@ -13,56 +15,7 @@ $today = Get-Date -Format "dd.MM.yyyy"
 $systemTempFolder = [System.IO.Path]::GetTempPath()
 $export = "Cohesity-DMaaS-M365-Report_" + $today + ".html"
 $units = "1" + $unit
-
-# Generic functions
-function getGraphReport {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory)][String]$reportName,
-        [Parameter(Mandatory)][ValidateSet("30","60","90","180")][String]$days
-    )
-    
-    try {
-        Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/reports/$($ReportName)(period=`'D$($days)`')" -OutputFilePath "$systemTempFolder$reportName.csv"
-        "$systemTempFolder$reportName.csv"
-    } catch {
-        Write-Host "Cannot get report! You need to authenticate using account with 'Reports.Read.All' rights." -ForegroundColor Red
-        exit
-    }            
-}
-
-function calculateGrowth {
-    param (
-        [Parameter(Mandatory)][string]$reportCSVfile, 
-        [Parameter(Mandatory)][string]$reportName
-
-    )
-    if ($reportName -eq 'getOneDriveUsageStorage'){
-        $usages = Import-Csv -Path $reportCSVfile | Where-Object {$_.'Site Type' -eq 'OneDrive'} |Sort-Object -Property "Report Date"
-    }else{
-        $usages = Import-Csv -Path $reportCSVfile | Sort-Object -Property "Report Date"
-    }
-    
-    $sum = 1
-    $storageUsage = @()
-    foreach ($item in $usages) {
-        if ($sum -eq 1){
-            $storageUsed = $item."Storage Used (Byte)"
-        }else {
-            $storageUsage += (
-                New-Object psobject -Property @{
-                    Growth =  [math]::Round(((($Item.'Storage Used (Byte)' / $storageUsed) -1) * 100),2)
-                }
-            )
-            $storageUsed = $item."Storage Used (Byte)"
-        }
-        $sum = $sum + 1
-    }
-    
-    $averageGrowth = ($storageUsage | Measure-Object -Property Growth -Average).Average
-    $averageGrowth = [math]::Ceiling(($AverageGrowth * 2)) 
-    return $averageGrowth
-}
+$sources = @("exchange", "oneDrive", "sharepoint")
 
 # Check if required modules are installed and if not install them
 $modules = @("Microsoft.Graph.Reports", "ExchangeOnlineManagement","PSWSMan")
@@ -91,46 +44,47 @@ try {
     exit
 }
 
-$global:sizingData = [ordered]@{
-    Exchange = [ordered]@{
-        NumberOfUsers = 0
-        totalSize   = 0
-        sizePerUser = 0
-        dailyGrowthPercentage = 0
-        firstYearFrontEndStorageUsed = 0
-        secondYearFrontEndStorageUsed = 0
-        thirdYearFrontEndStorageUsed = 0
+$global:sizingData = @{
+    exchange = @{
+        "numberOfUsers" = 0
+        "totalSize"   = 0
+        "sizePerUser" = 0
+        "dailyGrowthPercentage" = 0
+        "firstYearFrontEndStorageUsed" = 0
+        "secondYearFrontEndStorageUsed" = 0
+        "thirdYearFrontEndStorageUsed" = 0
     }
-    OneDrive = [ordered]@{
-        NumberOfUsers = 0
-        totalSize   = 0
-        sizePerUser = 0
-        dailyGrowthPercentage = 0
-        firstYearFrontEndStorageUsed = 0
-        secondYearFrontEndStorageUsed = 0
-        thirdYearFrontEndStorageUsed = 0
+    onedrive = @{
+        "numberOfUsers" = 0
+        "totalSize"   = 0
+        "sizePerUser" = 0
+        "dailyGrowthPercentage" = 0
+        "firstYearFrontEndStorageUsed" = 0
+        "secondYearFrontEndStorageUsed" = 0
+        "thirdYearFrontEndStorageUsed" = 0
     }
-    Sharepoint= [ordered]@{
-        NumberOfSites = 0
-        totalSize   = 0
-        sizePerUser = 0
-        dailyGrowthPercentage = 0
-        firstYearFrontEndStorageUsed = 0
-        secondYearFrontEndStorageUsed = 0
-        thirdYearFrontEndStorageUsed = 0
+    sharepoint= @{
+        "numberOfUsers" = 0
+        "totalSize"   = 0
+        "sizePerUser" = 0
+        "dailyGrowthPercentage" = 0
+        "firstYearFrontEndStorageUsed" = 0
+        "secondYearFrontEndStorageUsed" = 0
+        "thirdYearFrontEndStorageUsed" = 0
     }
 
-    TotalDataToProtect = [ordered]@{
-        firstYearTotalUsage = 0
-        secondYearTotalUsage = 0
-        thirdYearTotalUsage   = 0
+    totalDataToProtect = @{
+        "firstYearTotalUsage" = 0
+        "secondYearTotalUsage" = 0
+        "thirdYearTotalUsage" = 0
     }
 }
 
-$usageDetails = @{}
-$usageDetails.Add('Exchange', 'getMailboxUsageStorage')
-$usageDetails.Add('OneDrive', 'getOneDriveUsageStorage')
-$usageDetails.Add('SharePoint', 'getSharePointSiteUsageStorage')
+$usageDetails = @{ 
+    "exchange" = "getMailboxUsageStorage"
+    "onedrive" = "getOneDriveUsageStorage"
+    "sharepoint" = "getSharePointSiteUsageStorage"
+}
 
 foreach($item in $usageDetails.Keys){
     Write-Host "    Collecting usage details for $item" -ForegroundColor Yellow
@@ -150,124 +104,122 @@ foreach($item in $usageDetails.Keys){
 
     switch ($item) {
         'SharePoint' { $script:sizingData.$($item).NumberOfSites = $summarizedData.Count }
-        Default {$script:sizingData.$($item).NumberOfUsers = $summarizedData.Count}
+        Default {$script:sizingData.$($item).numberOfUsers = $summarizedData.Count}
     }
     $script:sizingData[$item].totalSize = [math]::Round(($($summarizedData.Sum)/$units), 2)    
     $script:sizingData[$item].sizePerUser = [math]::Round(($($summarizedData.Average)/$units), 2)
     
     Write-Host "    Calculating daily growth percentages" -ForegroundColor Yellow
+
+    if ($usageDetails[$item] -eq 'getOneDriveUsageStorage'){
+        $usages = Import-Csv -Path $systemTempFolder$reportName.csv | Where-Object {$_.'Site Type' -eq 'OneDrive'} |Sort-Object -Property "Report Date"
+    } else {
+        $usages = Import-Csv -Path $systemTempFolder$reportName.csv | Sort-Object -Property "Report Date"
+    }
     
-    $dailyGrowth = calculateGrowth -reportCSVfile $systemTempFolder$reportName.csv -reportName $usageDetails[$item]
+    $sum = 1
+    $storageUsage = @()
+    foreach ($usage in $usages) {
+        if ($sum -eq 1){
+            $storageUsed = $usage."Storage Used (Byte)"
+        }else {
+            $storageUsage += (
+                New-Object psobject -Property @{
+                    Growth =  [math]::Round(((($usage.'Storage Used (Byte)' / $storageUsed) -1) * 100),2)
+                }
+            )
+            $storageUsed = $usage."Storage Used (Byte)"
+        }
+        $sum = $sum + 1
+    }
+    
+    $dailyGrowth = ($storageUsage | Measure-Object -Property Growth -Average).Average
+    $dailyGrowth = [math]::Ceiling(($dailyGrowth * 2)) 
+
     $sizingData.$($item).dailyGrowthPercentage = [math]::Round($dailyGrowth,2)
     Remove-Item -Path $systemTempFolder$reportName.csv
 }
 Disconnect-MgGraph
 
 Write-Host "Connecting to Exchange Online Module to collect in-place archive sizes. Note! This can take several minutes." -ForegroundColor Yellow
-Connect-ExchangeOnline -ShowBanner:$false
-
-$FirstInterval = 500
-$SkipInternval = $FirstInterval
-$ArchiveMailboxSizeGb = 0
 try {
-    $ArchiveMailboxes = Get-ExoMailbox -Archive -ResultSize Unlimited
-    $ArchiveMailboxesCount = $ArchiveMailboxes.Count
+    Connect-ExchangeOnline -ShowBanner:$false
+} catch {
+    Write-Host "Couldn't connect to Exchange Online for in-place archive calculations. Please check!" -ForegroundColor Red
+    exit
+}
 
-    $ArchiveMailboxesFolders = @()
-    # Process the first N number of Archive Mailboxes. Where N = $FirstInterval
-    $ArchiveMailboxesFolders += $ArchiveMailboxes | Select -First $FirstInterval | Get-EXOMailboxFolderStatistics -Archive -Folderscope "Archive" | Select-Object name,FolderAndSubfolderSize
+Write-Host "Calculating Exchange Archive Mailbox sizes" -ForegroundColor Yellow
+$firstInterval = 500
+$skipInterval = $firstInterval
+$archiveMailBoxSize = 0
+
+$archiveMailboxes = Get-ExoMailbox -Archive -ResultSize Unlimited
+$archiveMailboxesCount = $ArchiveMailboxes.Count
+
+$archiveMailboxesFolders = @()
+$archiveMailboxesFolders += $ArchiveMailboxes | Select -First $FirstInterval | Get-EXOMailboxFolderStatistics -Archive -Folderscope "Archive" | Select-Object name,FolderAndSubfolderSize
     
-    # Process any remaining Archive Mailboxes at the pre-defined $FirstInterval
-    if ($ArchiveMailboxesCount -ge $FirstInterval){
+if ($archiveMailboxesCount -ge $firstInterval){
 
-        while($ArchiveMailboxesCount -ge 0)
-        {   
-            $ArchiveMailboxesCount = $ArchiveMailboxesCount - $FirstInterval
-            $ArchiveMailboxesFolders += $ArchiveMailboxes | Select -Skip $SkipInternval -First $FirstInterval | Get-EXOMailboxFolderStatistics -Archive -Folderscope "Archive" | Select-Object name,FolderAndSubfolderSize
-            $SkipInternval = $SkipInternval + $FirstInterval
-        }
-
-    }
-    
-    foreach($Folder in $ArchiveMailboxesFolders){
-        $FolderSize = $Folder.FolderAndSubfolderSize.ToString().split("(") | Select-Object -Index 1 
-        $FolderSizeBytes = $FolderSize.split("bytes") | Select-Object -Index 0
-        
-        $FolderSizeInGb = [math]::Round(([int64]$FolderSizeBytes / 1GB), 3, [MidPointRounding]::AwayFromZero)
-
-        $ArchiveMailboxSizeGb += $FolderSizeInGb
+    while($archiveMailboxesCount -ge 0)
+    {   
+        $archiveMailboxesCount = $archiveMailboxesCount - $firstInterval
+        $archiveMailboxesFolders += $archiveMailboxes | Select -Skip $SkipInternval -First $FirstInterval | Get-EXOMailboxFolderStatistics -Archive -Folderscope "Archive" | Select-Object name,FolderAndSubfolderSize
+        $skipInternval = $skipInternval + $firstInterval
     }
 }
-catch {
-    Write-Host "Unable to calculate In-Place Archive sizing" -ForegroundColor Red
+    
+foreach($folder in $archiveMailboxesFolders){
+    $folderSize = $folder.FolderAndSubfolderSize.ToString().split("(") | Select-Object -Index 1 
+    $folderSize = $folderSize.split("bytes") | Select-Object -Index 0
+        
+    $archiveMailboxSize += [math]::Round(($folderSize/$units), 2)
 }
 
 Write-Host "Calculating Exchange Shared Mailbox sizes" -ForegroundColor Yellow
-$FirstInterval = 500
-$SkipInternval = $FirstInterval
-$SharedMailboxesSizeGb = 0
-try {
-    # Process the first N number of Shared Mailboxes. Where N = $FirstInterval
-    $SharedMailboxes = Get-ExoMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited 
-    $SharedMailboxesCount = $SharedMailboxes.Count
+$firstInterval = 500
+$skipInternval = $FirstInterval
+$sharedMailboxesSize = 0
 
-    $SharedMailboxesSize = @()
-    $SharedMailboxesSize += $SharedMailboxes | Select -First $FirstInterval | Get-ExoMailboxStatistics| Select-Object TotalItemSize
+$sharedMailboxes = Get-ExoMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited 
+$sharedMailboxesCount = $sharedMailboxes.Count
 
-    # Process any remaining Shared Mailboxes at the pre-defined $FirstInterval
-    if ($SharedMailboxesCount -ge $FirstInterval){
+$sharedMailboxesSizes = @()
+$sharedMailboxesSizes += $sharedMailboxes | Select -First $FirstInterval | Get-ExoMailboxStatistics| Select-Object TotalItemSize
 
-        while($SharedMailboxesCount -ge 0)
-        {   
-            $SharedMailboxesCount = $SharedMailboxesCount - $FirstInterval
-            $SharedMailboxesSize += $SharedMailboxes | Select -Skip $SkipInternval -First $FirstInterval | Get-ExoMailboxStatistics| Select-Object TotalItemSize
-            $SkipInternval = $SkipInternval + $FirstInterval
-        }
-
+if ($sharedMailboxesCount -ge $firstInterval)
+{
+    while($sharedMailboxesCount -ge 0) {   
+        $sharedMailboxesCount = $sharedMailboxesCount - $firstInterval
+        $sharedMailboxesSizes += $sharedMailboxes | Select -Skip $skipInternval -First fFirstInterval | Get-ExoMailboxStatistics| Select-Object TotalItemSize
+        $skipInternval = $skipInternval + $firstInterval
     }
-
-    foreach($Folder in $SharedMailboxesSize){
-        $FolderSize = $Folder.TotalItemSize.Value.ToString().split("(") | Select-Object -Index 1
-        $FolderSizeBytes = $FolderSize.split("bytes") | Select-Object -Index 0
-        
-        $FolderSizeInGb = [math]::Round(([int64]$FolderSizeBytes / 1GB), 3, [MidPointRounding]::AwayFromZero)
-
-        $SharedMailboxesSizeGb += $FolderSizeInGb
-    }
-
-}
-catch {
-    Write-Host "Unable to calculate Shared Mailbox sizing" -ForegroundColor Red
 }
 
-$sizingData.Exchange.totalSize += $ArchiveMailboxSizeGb
-$sizingData.Exchange.totalSize += $SharedMailboxesSizeGb
+foreach($folder in $sharedMailboxesSizes) {
+    $folderSize = $folder.TotalItemSize.Value.ToString().split("(") | Select-Object -Index 1
+    $folderSize = $folderSize.split("bytes") | Select-Object -Index 0
+    $sharedMailboxesSize += [math]::Round(($folderSize/$units), 2)
+}
+
+$sizingData["exchange"].totalSize += $archiveMailboxSize
+$sizingData["exchange"].totalSize += $sharedMailboxesSize
 
 Disconnect-ExchangeOnline -Confirm:$false -InformationAction Ignore -ErrorAction SilentlyContinue
 
-Write-Host "Calculating storage required for Cohesity DMaaS" -ForegroundColor Yellow
-foreach($Section in $sizingData | Select-Object -ExpandProperty Keys){
+Write-Host "Calculating storage required for upcoming years" -ForegroundColor Yellow
+foreach($source in $sources) {
 
-    if ( $Section -NotIn @("Licensing", "TotalDataToProtect") )
-    {
-        $sizingData.$($Section).firstYearFrontEndStorageUsed = $sizingData.$($Section).totalSize * (1.0 + (($sizingData.$($Section).dailyGrowthPercentage / 100) * 1))
-        $sizingData.$($Section).secondYearFrontEndStorageUsed = $sizingData.$($Section).totalSize * (1.0 + (($sizingData.$($Section).dailyGrowthPercentage / 100) * 2))        
-        $sizingData.$($Section).thirdYearFrontEndStorageUsed = $sizingData.$($Section).totalSize * (1.0 + (($sizingData.$($Section).dailyGrowthPercentage / 100) * 3))
+    $sizingData[$source].firstYearFrontEndStorageUsed = [math]::Round(($sizingData[$source].totalSize * (1.0 + (($sizingData[$source].dailyGrowthPercentage / 100) * 1))), 2)
+    $sizingData[$source].secondYearFrontEndStorageUsed = [math]::Round(($sizingData[$source].totalSize * (1.0 + (($sizingData[$source].dailyGrowthPercentage / 100) * 2))), 2)       
+    $sizingData[$source].thirdYearFrontEndStorageUsed = [math]::Round(($sizingData[$source].totalSize * (1.0 + (($sizingData[$source].dailyGrowthPercentage / 100) * 3))), 2)
     
-        $sizingData.TotalDataToProtect.firstYearTotalUsage = $sizingData.TotalDataToProtect.firstYearTotalUsage + $sizingData.$($Section).firstYearFrontEndStorageUsed
-        $sizingData.TotalDataToProtect.secondYearTotalUsage = $sizingData.TotalDataToProtect.thirdYearTotalUsage + $sizingData.$($Section).secondYearFrontEndStorageUsed
-        $sizingData.TotalDataToProtect.thirdYearTotalUsage = $sizingData.TotalDataToProtect.thirdYearTotalUsage + $sizingData.$($Section).thirdYearFrontEndStorageUsed
-    }
-
+    $sizingData["totalDataToProtect"].firstYearTotalUsage = [math]::Round(($sizingData["totalDataToProtect"].firstYearTotalUsage + $sizingData[$source].firstYearFrontEndStorageUsed), 2)
+    $sizingData["totalDataToProtect"].secondYearTotalUsage = [math]::Round(($sizingData["totalDataToProtect"].thirdYearTotalUsage + $sizingData[$source].secondYearFrontEndStorageUsed), 2)
+    $sizingData["totalDataToProtect"].thirdYearTotalUsage = [math]::Round(($sizingData["totalDataToProtect"].thirdYearTotalUsage + $sizingData[$source].thirdYearFrontEndStorageUsed), 2)
+    
 }
-
-# Calculate the total number of licenses required
-if ($sizingData.Exchange.NumberOfUsers -gt $sizingData.OneDrive.NumberOfUsers){
-    $UserLicensesRequired = $sizingData.Exchange.NumberOfUsers
-} else {
-    $UserLicensesRequired = $sizingData.OneDrive.NumberOfUsers
-}
-
 
 # Report HTML template
 $reportContent=@"                            
@@ -316,7 +268,7 @@ $reportContent=@"
 
 <b>Total Size: </b>$($sizingData["Exchange"].totalSize) $unit<br>
 <b>Average Growth Forecast (Yearly): </b>$($sizingData["Exchange"].dailyGrowthPercentage) %<br>
-<b>Number of Users: </b>$($sizingData["Exchange"].NumberOfUsers)<br>
+<b>Number of Users: </b>$($sizingData["Exchange"].numberOfUsers)<br>
 <b>First Year Front-End Storage Used: </b>$($sizingData["Exchange"].firstYearFrontEndStorageUsed) $unit<br>
 <b>Second Year Front-End Storage Used: </b>$($sizingData["Exchange"].secondYearFrontEndStorageUsed) $unit<br>
 <b>Third Year Front-End Storage Used: </b>$($sizingData["Exchange"].thirdYearFrontEndStorageUsed) $unit<br>
@@ -325,9 +277,9 @@ $reportContent=@"
 <img src="data:image/jpeg;base64,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" />
 <br><br>
 
-<b>Total Size: </b>$($sizingData[1].totalSize) $unit<br>
+<b>Total Size: </b>$($sizingData["OneDrive"].totalSize) $unit<br>
 <b>Average Growth Forecast (Yearly): </b>$($sizingData["OneDrive"].dailyGrowthPercentage) %<br>
-<b>Number of Users: </b>$($sizingData["OneDrive"].NumberOfUsers)<br>
+<b>Number of Users: </b>$($sizingData["OneDrive"].numberOfUsers)<br>
 <b>First Year Front-End Storage Used: </b>$($sizingData["OneDrive"].firstYearFrontEndStorageUsed) $unit<br>
 <b>Second Year Front-End Storage Used: </b>$($sizingData["OneDrive"].secondYearFrontEndStorageUsed) $unit<br>
 <b>Third Year Front-End Storage Used: </b>$($sizingData["OneDrive"].thirdYearFrontEndStorageUsed) $unit<br>
@@ -337,11 +289,11 @@ $reportContent=@"
 
 <br><br>
 
-<b>Total Size: </b>$($sizingData[2].totalSize) $unit<br>
+<b>Total Size: </b>$($sizingData["Sharepoint"].totalSize) $unit<br>
 <b>Average Growth Forecast (Yearly): </b>$($sizingData["Sharepoint"].dailyGrowthPercentage) %<br>
 <b>Number of Sites: </b>$($sizingData["Sharepoint"].NumberOfSites)<br>
 <b>First Year Front-End Storage Used: </b>$($sizingData["Sharepoint"].firstYearFrontEndStorageUsed) $unit<br>
-<b>Second Year Front-End Storage Used: </b>$($sizingData["Sharepoint"].thirdYearFrontEndStorageUsed) $unit<br>
+<b>Second Year Front-End Storage Used: </b>$($sizingData["Sharepoint"].secondYearFrontEndStorageUsed) $unit<br>
 <b>Third Year Front-End Storage Used: </b>$($sizingData["Sharepoint"].thirdYearFrontEndStorageUsed) $unit<br>
 
 <br><br>
@@ -351,7 +303,7 @@ $reportContent=@"
 <big><big><big><b>Total Numbers</b></big></big></big><br>
 <b>Total Users: </b>$UserLicensesRequired<br>
 <b>First Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].firstYearTotalUsage) $unit<br>
-<b>Second Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].thirdYearTotalUsage) $unit<br>
+<b>Second Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].secondYearTotalUsage) $unit<br>
 <b>Third Year Total Front-End Storage: </b>$($sizingData["TotalDataToProtect"].thirdYearTotalUsage) $unit<br>
 
 </body>
