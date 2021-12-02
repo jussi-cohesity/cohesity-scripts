@@ -14,11 +14,14 @@ Run these commands from PowerShell to download the module installation helper an
 
 ```powershell
 # Download Commands
-$apiRepoURL = 'https://raw.githubusercontent.com/bseltz-cohesity/scripts/master/powershell'
-$repoURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/reporting/cohesity-license-consumers'
-(Invoke-WebRequest -Uri "$repoUrl/cohesity-license-consumers.ps1").content | Out-File "cohesity-license-consumers.ps1"; (Get-Content "cohesity-license-consumers.ps1") | Set-Content "cohesity-license-consumers.ps1"
+$moduleInstallURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/M365/cohesity-dmaas-m365-sizing-preregs.ps1'
+$sizerScriptURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/M365/cohesity-dmaas-m365-sizing.ps1'
 
-(Invoke-WebRequest -Uri "$apiRepoUrl/cohesity-api/cohesity-api.ps1").content | Out-File cohesity-api.ps1; (Get-Content cohesity-api.ps1) | Set-Content cohesity-api.ps1
+(Invoke-WebRequest -Uri "$moduleInstallURL.ps1").content | Out-File "cohesity-dmaas-m365-sizing-preregs.ps1"; (Get-Content "cohesity-dmaas-m365-sizing-preregs.ps1") | Set-Content "cohesity-dmaas-m365-sizing-preregs.ps1"
+
+(Invoke-WebRequest -Uri "sizerScriptURL").content | Out-File "cohesity-dmaas-m365-sizing.ps1"; (Get-Content "ccohesity-dmaas-m365-sizing.ps1") | Set-Content "cohesity-dmaas-m365-sizing.ps1"
+
+. /cohesity-dmaas-m365-sizing-preregs.ps1
 # End Download Commands
 ```
 
