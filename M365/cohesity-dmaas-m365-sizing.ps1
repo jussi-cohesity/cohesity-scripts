@@ -64,7 +64,7 @@ $global:sizingData = @{
         "thirdYearFrontEndStorageUsed" = 0
     }
     sharepoint= @{
-        "numberOfUsers" = 0
+        "numberOfsites" = 0
         "totalSize"   = 0
         "sizePerUser" = 0
         "dailyGrowthPercentage" = 0
@@ -80,41 +80,68 @@ $global:sizingData = @{
     }
 }
 
-$usageDetails = @{ 
-    "exchange" = "getMailboxUsageStorage"
-    "onedrive" = "getOneDriveUsageStorage"
-    "sharepoint" = "getSharePointSiteUsageStorage"
+function downloadReport {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)][String]$report,
+        [Parameter(Mandatory)][String]$days
+    )
+    process {
+        try {
+            Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/reports/$($report)(period=`'D$($days)`')" -OutputFilePath "$systemTempFolder$report.csv" 
+            
+            "$systemTempFolder$report.csv"
+        } catch {
+            Write-Host "Cannot get report! You need to authenticate using account with 'Reports.Read.All' rights." -ForegroundColor Red
+            exit
+        }
+    } 
 }
 
-foreach($item in $usageDetails.Keys){
-    Write-Host "    Collecting usage details for $item" -ForegroundColor Yellow
+$detailReports = @{
+    "Exchange" = "getMailboxUsageDetail"
+    "OneDrive" = "getOneDriveUsageAccountDetail"
+    "Sharepoint" = "getSharePointSiteUsageDetail"
+}
 
-    $reportName = $usageDetails[$item]
-    try {
-        Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/reports/$($reportName)(period=`'D$($days)`')" -OutputFilePath "$systemTempFolder$reportName.csv"
-    } catch {
-        Write-Host "Cannot get report! You need to authenticate using account with 'Reports.Read.All' rights." -ForegroundColor Red
-        exit
-    }            
+$usageReports = @{ 
+    "Exchange" = "getMailboxUsageStorage"
+    "Onedrive" = "getOneDriveUsageStorage"
+    "Sharepoint" = "getSharePointSiteUsageStorage"
+}
 
-    Write-Host "    Processing usage details $reportCSVfile" -ForegroundColor Yellow
+foreach($item in $detailReports.Keys) {
+    Write-Host "....Collecting details for $item" -ForegroundColor Yellow
 
-    $reportContent = Import-Csv -Path $systemTempFolder$reportName.csv
-    $summarizedData = $reportContent | Measure-Object -Property 'Storage Used (Byte)' -Sum -Average
+    $reportFile = downloadReport -report $detailReports[$item] -days $days          
+
+    Write-Host "......Processing details for $item" -ForegroundColor Yellow
+
+    # Process only active users
+    $reportContent = Import-Csv -Path $reportFile | Where-Object {$_.'Is Deleted' -eq 'FALSE'}
+    $totalData = $reportContent | Measure-Object -Property 'Storage Used (Byte)' -Sum -Average
 
     switch ($item) {
-        'SharePoint' { $script:sizingData.$($item).NumberOfSites = $summarizedData.Count }
-        Default {$script:sizingData.$($item).numberOfUsers = $summarizedData.Count}
+        'Sharepoint' { $sizingData[$item].NumberOfSites = $totalData.Count }
+        Default { $sizingData[$item].numberOfUsers = $totalData.Count}
     }
-    $script:sizingData[$item].totalSize = [math]::Round(($($summarizedData.Sum)/$units), 2)    
-    $script:sizingData[$item].sizePerUser = [math]::Round(($($summarizedData.Average)/$units), 2)
-    
-    Write-Host "    Calculating daily growth percentages" -ForegroundColor Yellow
+    $sizingData[$item].totalSize = [math]::Round(($($totalData.Sum)/$units), 2)    
+    $sizingData[$item].sizePerUser = [math]::Round(($($totalData.Average)/$units), 2)
 
-    if ($usageDetails[$item] -eq 'getOneDriveUsageStorage'){
-        $usages = Import-Csv -Path $systemTempFolder$reportName.csv | Where-Object {$_.'Site Type' -eq 'OneDrive'} |Sort-Object -Property "Report Date"
+    Remove-Item -Path $reportFile
+}
+
+foreach($item in $usageReports.Keys) {
+    Write-Host "....Collecting usage details for $item" -ForegroundColor Yellow
+
+    $reportFile = downloadReport -report $usageReports[$item] -days $days
+
+    Write-Host "......Calculating daily growth percentages" -ForegroundColor Yellow
+
+    if ($usageReports[$item] -eq 'getOneDriveUsageStorage'){
+        $usages = Import-Csv -Path $reportFile | Where-Object {$_.'Site Type' -eq 'OneDrive'} |Sort-Object -Property "Report Date"
     } else {
-        $usages = Import-Csv -Path $systemTempFolder$reportName.csv | Sort-Object -Property "Report Date"
+        $usages = Import-Csv -Path $reportFile | Sort-Object -Property "Report Date"
     }
     
     $sum = 1
@@ -136,9 +163,10 @@ foreach($item in $usageDetails.Keys){
     $dailyGrowth = ($storageUsage | Measure-Object -Property Growth -Average).Average
     $dailyGrowth = [math]::Ceiling(($dailyGrowth * 2)) 
 
-    $sizingData.$($item).dailyGrowthPercentage = [math]::Round($dailyGrowth,2)
-    Remove-Item -Path $systemTempFolder$reportName.csv
+    $sizingData[$item].dailyGrowthPercentage = [math]::Round($dailyGrowth,2)
+    Remove-Item -Path $reportFile
 }
+
 Disconnect-MgGraph
 
 Write-Host "Connecting to Exchange Online Module to collect in-place archive sizes. Note! This can take several minutes." -ForegroundColor Yellow
