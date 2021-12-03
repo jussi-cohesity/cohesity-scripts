@@ -1,4 +1,4 @@
-### Example script to export all cluster users/groups with their mapped roless - Jussi Jaurola <jussi@cohesity.com>
+### Example script to export all cluster users/groups with their mapped roles - Jussi Jaurola <jussi@cohesity.com>
 
 ### process commandline arguments
 [CmdletBinding()]
