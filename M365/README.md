@@ -21,7 +21,7 @@ $sizerScriptURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scr
 
 (Invoke-WebRequest -Uri "$sizerScriptURL").content | Out-File "cohesity-dmaas-m365-sizing.ps1"; (Get-Content "ccohesity-dmaas-m365-sizing.ps1") | Set-Content "cohesity-dmaas-m365-sizing.ps1"
 
-. $(Join-Path -Path $PSScriptRoot -ChildPath cohesity-dmaas-m365-sizing-preregs.ps1)
+. ./cohesity-dmaas-m365-sizing-preregs.ps1
 ```
 
 Next copy-paste these to PowerShell window to launch actual sizer. Note sizer will open your browser and ask you to authenticate to M365 portal twice. This is because script uses two different integrations and both require their own authentication. This script just connects to your M365 account for reporting download use.
