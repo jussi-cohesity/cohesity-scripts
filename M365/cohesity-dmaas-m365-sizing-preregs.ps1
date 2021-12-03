@@ -17,3 +17,5 @@ foreach($module in $modules)
         Write-Host "   Module found!" -ForegroundColor Yellow
     }
 }
+
+Write-Host "NOTE! Please close this PowerShell session and open new to download actual sizer tool and to run it!" -ForegroundColor Yellow
