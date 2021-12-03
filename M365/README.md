@@ -17,7 +17,7 @@ Run these commands from PowerShell to download the module installation helper an
 $moduleInstallURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/M365/cohesity-dmaas-m365-sizing-preregs.ps1'
 $sizerScriptURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scripts/master/M365/cohesity-dmaas-m365-sizing.ps1'
 
-(Invoke-WebRequest -Uri "$moduleInstallURL.ps1").content | Out-File "cohesity-dmaas-m365-sizing-preregs.ps1"; (Get-Content "cohesity-dmaas-m365-sizing-preregs.ps1") | Set-Content "cohesity-dmaas-m365-sizing-preregs.ps1"
+(Invoke-WebRequest -Uri "$moduleInstallURL").content | Out-File "cohesity-dmaas-m365-sizing-preregs.ps1"; (Get-Content "cohesity-dmaas-m365-sizing-preregs.ps1") | Set-Content "cohesity-dmaas-m365-sizing-preregs.ps1"
 
 (Invoke-WebRequest -Uri "sizerScriptURL").content | Out-File "cohesity-dmaas-m365-sizing.ps1"; (Get-Content "ccohesity-dmaas-m365-sizing.ps1") | Set-Content "cohesity-dmaas-m365-sizing.ps1"
 
