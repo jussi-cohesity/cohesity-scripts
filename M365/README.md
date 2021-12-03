@@ -19,7 +19,7 @@ $sizerScriptURL = 'https://raw.githubusercontent.com/jussi-cohesity/cohesity-scr
 
 (Invoke-WebRequest -Uri "$moduleInstallURL").content | Out-File "cohesity-dmaas-m365-sizing-preregs.ps1"; (Get-Content "cohesity-dmaas-m365-sizing-preregs.ps1") | Set-Content "cohesity-dmaas-m365-sizing-preregs.ps1"
 
-(Invoke-WebRequest -Uri "sizerScriptURL").content | Out-File "cohesity-dmaas-m365-sizing.ps1"; (Get-Content "ccohesity-dmaas-m365-sizing.ps1") | Set-Content "cohesity-dmaas-m365-sizing.ps1"
+(Invoke-WebRequest -Uri "$sizerScriptURL").content | Out-File "cohesity-dmaas-m365-sizing.ps1"; (Get-Content "ccohesity-dmaas-m365-sizing.ps1") | Set-Content "cohesity-dmaas-m365-sizing.ps1"
 
 . $(Join-Path -Path $PSScriptRoot -ChildPath cohesity-dmaas-m365-sizing-preregs.ps1)
 ```
