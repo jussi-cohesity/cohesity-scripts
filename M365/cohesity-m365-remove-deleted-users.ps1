@@ -36,22 +36,6 @@ try {
     Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
 }
 
-
-While ($true) {
-    $source = Get-CohesityProtectionSource -Environments kO365 | Where { $_.protectionSource.name -match $protectionSource }
-    $currentRefresh = $source.registrationInfo.refreshTimeUsecs
-    
-    Write-Host "Last refresh time for source is $lastRefresh"
-
-    if ($lastRefresh -lt $currentRefresh) {
-        Write-Host "Source refreshed successfully!"
-        break
-    } else {
-        Write-Host "Source refresh is not yet done. Sleeping 60 seconds...."
-        Start-Sleep 60
-    }
-}
-
 ### List all objects from source
 Write-Host "Getting objects for source $protectionSource" -ForegroundColor Yellow
 $availableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -notmatch $($excludeDomain) }
