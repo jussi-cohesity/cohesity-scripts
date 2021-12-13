@@ -47,7 +47,7 @@ if (!$availableObjects) {
 $sourceObjectIds = [System.Collections.ArrayList]::new()
 
 foreach ($object in $availableObjects) {
-    $sourceObjectIds.Add($object.id)
+    $sourceObjectIds.Add($object.id) | out-null
 }
 
 ### Get protectiongroup
@@ -67,7 +67,7 @@ foreach ($jobSourceId in $jobSourceIds) {
     
     if ($sourceObjectIds -eq $jobSourceId) {
         Write-Host "User $jobSourceId found still from source. Let's keep it!" -ForegroundColor Yellow
-        $newSourceObjects.Add($jobSourceId)
+        $newSourceObjects.Add($jobSourceId) | out-null
     } else {
         Write-Host "User $jobSourceId is deleted so let's remove it also" -ForegroundColor Red
     }
