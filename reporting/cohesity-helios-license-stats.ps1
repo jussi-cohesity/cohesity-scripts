@@ -23,7 +23,7 @@ try {
 $globalLicenseUsages = @{}
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Cluster, dataPlatform, cloudArchive, cloudTier, cloudSpin, dataProtect"
+Add-Content -Path $export -Value "Cluster, dataPlatform, cloudArchive, cloudTier, cloudSpin, dataProtect, archive, smartFiles, dataProtectReplica, dataProtectService"
 
 $clusters = heliosClusters | Select-Object -Property name
 foreach ($cluster in $clusters.name) {
@@ -45,6 +45,6 @@ foreach ($cluster in $clusters.name) {
 
 Write-Host "Exporting license usages to $export"
 $globalLicenseUsages.GetEnumerator() | ForEach-Object {
-    $line = "{0},{1},{2},{3},{4},{5}" -f $_.Name, $_.Value.dataPlatform, $_.Value.cloudArchive, $_.Value.cloudTier, $_.Value.cloudSpin, $_.Value.dataProtect 
+    $line = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}" -f $_.Name, $_.Value.dataPlatform, $_.Value.cloudArchive, $_.Value.cloudTier, $_.Value.cloudSpin, $_.Value.dataProtect, $_.Value.archive, $_.Value.smartFiles, $_.Value.dataProtectReplica, $_.Value.dataProtectService 
     Add-Content -Path $export -Value $line   
 }
