@@ -74,7 +74,7 @@ foreach ($protectiongroup in $protectiongroups) {
                 }
             }
 
-            $report = @($report + ("{0},{1},{2},{3},{4},{5},{6}" -f $objectName, $protectionGroupName, $localStartTime, $localExpiryTime, $archiveTargetName, $archiveStartTime, $archiveExpiryTime))
+            $report = @($report + ("{0},{1},{2},{3},{4},{5},{6}" -f $objectName, $protectiongroup, $localStartTime, $localExpiryTime, $archiveTargetName, $archiveStartTime, $archiveExpiryTime))
         }
     }
     
