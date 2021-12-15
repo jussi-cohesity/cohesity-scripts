@@ -6,7 +6,7 @@ param (
     [Parameter(Mandatory = $True)][string]$cluster, 
     [Parameter(Mandatory = $True)][string]$apikey,
     [Parameter()][string]$protectionGroup,
-    [Parameter(Mandatory = $True)][string]$export 
+    [Parameter()][string]$export 
     )
 
 if (!(Get-Module -ListAvailable -Name Cohesity.PowerShell.Core)) {
