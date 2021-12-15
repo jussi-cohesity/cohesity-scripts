@@ -133,5 +133,8 @@ $cloneContent = @{
 
 $cloneTask = api post views/overwrite $cloneContent
 
+Write-Host "Adding share and user permissions"
+$settings = api put file-services/views/$($view.viewId) $newView -v2
+
 Write-Host "Deleting temporary view $temporaryView" 
 $null = api delete "views/$temporaryView"
