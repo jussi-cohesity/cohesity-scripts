@@ -24,5 +24,4 @@ try {
     Write-Error "Cannot connect to Cohesity cluster $($cohesityCluster)"
 }
 
-Find-CohesityFilesForRestore -Search log4j-core | Select-Object Filename,@{Name="Name"; Expression={$_.ProtectionSource.name}}
-
+Find-CohesityFilesForRestore -Search log4j-core | Select-Object Filename,@{Name="Source"; Expression={$_.ProtectionSource.name}}
