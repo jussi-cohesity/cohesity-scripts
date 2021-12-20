@@ -40,7 +40,7 @@ $databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-
 $databaseProtectionJob = New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.ParentId) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
 
 ### Run Protection Jobs
-Get-CohesityProtectionJob -Names $database | Start-CohesityProtectionJob -RunType KFull
+Get-CohesityProtectionJob -Names $databaseName | Start-CohesityProtectionJob -RunType KFull
 
 ### Wait until jobs are finished
 Start-Sleep 60
