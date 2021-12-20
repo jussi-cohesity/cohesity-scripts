@@ -25,7 +25,7 @@ try {
 
 Get-CohesityProtectionSource -Environments kSQL | ForEach-Object { Update-CohesityProtectionSource -Id $_.protectionSource.Id}
 
-
+$databaseName = "$(dbName)"
 ### Create protection policy for object
 $storageDomain = Get-CohesityStorageDomain -Names DefaultStorageDomain
 
@@ -34,7 +34,7 @@ $policyName = "pipeline-" + "$(dbName)"
 $policy = New-CohesityProtectionPolicy -PolicyName $policyName -BackupInHours 14 -RetainInDays $retainDays -Confirm:$false
 
 ### Find DB to protect
-$databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-Object { $_.name -match $(database) } | Select-Object -First 1
+$databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-Object { $_.name -match $(databaseName) } | Select-Object -First 1
 
 ### Create job to protect database
 $databaseProtectionJob = New-CohesityProtectionJob -Name $database -PolicyName $policyName -SourceIds $($databaseObject.ParentId) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
