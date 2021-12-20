@@ -28,7 +28,8 @@ Get-CohesityProtectionSource -Environments kSQL | ForEach-Object { Update-Cohesi
 
 ### Create protection policy for object
 $storageDomain = Get-CohesityStorageDomain -Names DefaultStorageDomain
-$policyName = "pipeline-" + $(dbName)
+
+$policyName = "pipeline-" + "$(dbName)"
 
 $policy = New-CohesityProtectionPolicy -PolicyName $policyName -BackupInHours 14 -RetainInDays $retainDays -Confirm:$false
 
