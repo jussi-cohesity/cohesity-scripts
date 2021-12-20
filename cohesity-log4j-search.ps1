@@ -24,14 +24,5 @@ try {
     Write-Error "Cannot connect to Cohesity cluster $($cohesityCluster)"
 }
 
-Write-Host "Getting protectected objects and searching log4j-core -package"
-$objects = Get-CohesityProtectionSourceObject
-$files = Find-CohesityFilesForRestore -Search log4j-core
-
-Write-Host "Source - Filename"
-foreach ($file in $files) {
-    $fileSource = ($objects | Where { $_.Id -eq $($file.SourceId)} | Select Name -First 1).name
-    Write-Host "$fileSource - $($file.Filename)"
-}
-
+Find-CohesityFilesForRestore -Search log4j-core | Select-Object Filename,@{Name="Name"; Expression={$_.ProtectionSource.name}}
 
