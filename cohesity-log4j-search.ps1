@@ -14,8 +14,6 @@ if ($module) {
 } else {
     Install-Module -Name Cohesity.PowerShell.Core -Scope CurrentUser -Force
     Get-Module -ListAvailable -Name Cohesity* | Import-Module
-} catch {
-    Write-Error "Couldn't install Cohesity PowerShell Module"
 }
 
 try {
