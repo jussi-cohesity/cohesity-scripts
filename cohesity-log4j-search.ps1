@@ -5,7 +5,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster, 
     [Parameter(Mandatory = $True)][string]$cohesityUsername,
-    [Parameter()][string]$cohesityPassword
+    [Parameter(Mandatory = $True)][string]$cohesityPassword
     )
 
 $module = Get-Module -ListAvailable -Name Cohesity* 
