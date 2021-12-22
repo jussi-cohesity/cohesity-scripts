@@ -11,11 +11,10 @@ $module = Get-Module -ListAvailable -Name Cohesity*
 if ($module) {
     Get-Module -ListAvailable -Name Cohesity* | Import-Module
 } else {
+    Install-PackageProvider -Name NuGet -Force
     Register-PSRepository -Default
     Install-Module -Name Cohesity.PowerShell -Scope CurrentUser -Force
     Get-Module -ListAvailable -Name Cohesity* | Import-Module
-} catch {
-    Write-Error "Couldn't install Cohesity PowerShell Module"
 }
 
 try {
