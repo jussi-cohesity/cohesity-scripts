@@ -32,7 +32,7 @@ $policyName = "pipeline-" + "$(dbName)"
 $policy = New-CohesityProtectionPolicy -PolicyName $policyName -BackupInHours 14 -RetainInDays $retainDays -Confirm:$false
 
 ### Find DB to protect
-$databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-Object { $_.name -match $(databaseName) } | Select-Object -First 1
+$databaseObject = Get-CohesityProtectionSourceObject -Environments kSQL | Where-Object { $_.name -match $databaseName } | Select-Object -First 1
 
 ### Create job to protect database
 $databaseProtectionJob = New-CohesityProtectionJob -Name $databaseName -PolicyName $policyName -SourceIds $($databaseObject.ParentId) -StorageDomainName 'DefaultStorageDomain' -Environment kSQL -ParentSourceId $($databaseObject.ParentId)
