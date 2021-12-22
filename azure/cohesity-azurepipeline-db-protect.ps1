@@ -11,8 +11,6 @@ $module = Get-Module -ListAvailable -Name Cohesity*
 if ($module) {
     Get-Module -ListAvailable -Name Cohesity* | Import-Module
 } else {
-    Install-PackageProvider -Name NuGet -Force
-    Register-PSRepository -Default
     Install-Module -Name Cohesity.PowerShell -Scope CurrentUser -Force
     Get-Module -ListAvailable -Name Cohesity* | Import-Module
 }
