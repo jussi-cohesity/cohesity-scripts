@@ -31,7 +31,7 @@ $today = Get-Date -Format "dd.MM.yyyy"
 $export = "cohesity_" + $today + ".csv"
 $line = "PVM`t;`t{0}" -f $today
 Add-Content -Path $export -Value $line
-Add-Content -Path $export -Value "Nodename`t;`tReporting GB"
+Add-Content -Path $export -Value "Nodename`t;`tProtection Group;`tSource Size GB;`tGB Read;`tLocal GB Written;`tCloud GB Written"
 
 $report = @{}
 
@@ -49,9 +49,13 @@ foreach ($job in $jobs.protectionGroups) {
                 if($sourcename -notin $report.Keys){
                     $report[$sourcename] = @{}
                     $report[$sourcename]['protectionGroup'] = $jobName
-                    $report[$sourcename]['size'] = 0
+                    $report[$sourcename]['totalSourceSizeBytes'] = 0
+                    $report[$sourcename]['totalBytesReadFromSource'] = 0
+                    $report[$sourcename]['totalPhysicalBackupSizeBytes'] = 0
                 }
-                $report[$sourcename]['size'] += $source.stats.totalBytesReadFromSource
+                $report[$sourcename]['totalSourceSizeBytes'] = [math]::Round($source.stats.totalSourceSizeBytes/1GB,2)
+                $report[$sourcename]['totalBytesReadFromSource'] += [math]::Round($source.stats.totalBytesReadFromSource/1GB,2)
+                $report[$sourcename]['totalPhysicalBackupSizeBytes'] += [math]::Round($source.stats.totalPhysicalBackupSizeBytes/1GB,2)            
             }
         }
     }       
@@ -60,7 +64,6 @@ foreach ($job in $jobs.protectionGroups) {
 ### Export data
 Write-Host "Exporting data..." -ForegroundColor Yellow
 $report.GetEnumerator() | Sort-Object -Property {$_.Name} | ForEach-Object {
-    $totalSize =  [math]::Round($_.Value.size/1GB,2)
-    $line = "{0}`t;`t{1}" -f $_.Name, $totalSize
+    $line = "{0}`t;`t{1};`t{2};`t{3};`t{4};`t{5}" -f $_.Name, $_.Value.protectionGroup, $_.Value.totalSourceSizeBytes, $_.Value.totalBytesReadFromSource, $_.Value.totalPhysicalBackupSizeBytes, $_.Value.totalPhysicalBackupSizeBytes
     Add-Content -Path $export -Value $line   
 }
