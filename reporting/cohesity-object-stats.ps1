@@ -43,6 +43,7 @@ foreach ($job in $jobs.protectionGroups) {
   Write-Host "Collecting stats for Protection Group $($job.name)" -ForegroundColor Yellow
     $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=false
     foreach ($run in $runs) {
+        if ($run.copyRun.status[0]) { $cloudArchiveInUse = $true } else { $cloudArchiveInUse = $false }
         if ($run.backupRun.snapshotsDeleted -eq $false) {
             foreach($source in $run.backupRun.sourceBackupStatus) {
                 $sourcename = $source.source.name
@@ -52,10 +53,15 @@ foreach ($job in $jobs.protectionGroups) {
                     $report[$sourcename]['totalSourceSizeBytes'] = 0
                     $report[$sourcename]['totalBytesReadFromSource'] = 0
                     $report[$sourcename]['totalPhysicalBackupSizeBytes'] = 0
+                    $report[$sourcename]['totalCloudBackupSizeBytes'] = 0
                 }
                 $report[$sourcename]['totalSourceSizeBytes'] = [math]::Round($source.stats.totalSourceSizeBytes/1GB,2)
                 $report[$sourcename]['totalBytesReadFromSource'] += [math]::Round($source.stats.totalBytesReadFromSource/1GB,2)
-                $report[$sourcename]['totalPhysicalBackupSizeBytes'] += [math]::Round($source.stats.totalPhysicalBackupSizeBytes/1GB,2)            
+                $report[$sourcename]['totalPhysicalBackupSizeBytes'] += [math]::Round($source.stats.totalPhysicalBackupSizeBytes/1GB,2)  
+                
+                if ($cloudArchiveInUse -eq $true) {
+                    $report[$sourcename]['totalCloudBackupSizeBytes'] += [math]::Round($source.stats.totalPhysicalBackupSizeBytes/1GB,2)
+                }
             }
         }
     }       
@@ -64,6 +70,6 @@ foreach ($job in $jobs.protectionGroups) {
 ### Export data
 Write-Host "Exporting data..." -ForegroundColor Yellow
 $report.GetEnumerator() | Sort-Object -Property {$_.Name} | ForEach-Object {
-    $line = "{0}`t;`t{1};`t{2};`t{3};`t{4};`t{5}" -f $_.Name, $_.Value.protectionGroup, $_.Value.totalSourceSizeBytes, $_.Value.totalBytesReadFromSource, $_.Value.totalPhysicalBackupSizeBytes, $_.Value.totalPhysicalBackupSizeBytes
+    $line = "{0}`t;`t{1};`t{2};`t{3};`t{4};`t{5}" -f $_.Name, $_.Value.protectionGroup, $_.Value.totalSourceSizeBytes, $_.Value.totalBytesReadFromSource, $_.Value.totalPhysicalBackupSizeBytes, $_.Value.totalCloudBackupSizeBytes
     Add-Content -Path $export -Value $line   
 }
