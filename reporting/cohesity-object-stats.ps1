@@ -44,7 +44,10 @@ foreach ($job in $jobs.protectionGroups) {
   Write-Host "Collecting stats for Protection Group $($job.name)" -ForegroundColor Yellow
     $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=false
     foreach ($run in $runs) {
-        if ($run.copyRun.status[0]) { $cloudArchiveInUse = $true } else { $cloudArchiveInUse = $false }
+        ### Check if run contains cloudArchive task
+        $isCloudArchive = $run.copyRun | Where { $_.target.type -eq 'kArchival' }
+        if ($isCloudArchive) { $cloudArchiveInUse = $true } else { $cloudArchiveInUse = $false }
+        
         if ($run.backupRun.snapshotsDeleted -eq $false) {
             foreach($source in $run.backupRun.sourceBackupStatus) {
                 $sourcename = $source.source.name
