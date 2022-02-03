@@ -56,9 +56,9 @@ foreach ($stat in $stats.statsList) {
         $report[$jobName]['customerAgreement'] = $customerAgreement
         $report[$jobName]['environmentType'] = $stat.protectionEnvironment
         $report[$jobName]['protectedObjectCount'] = $protectedObjectCount
-        $report[$jobName]['dataIn'] = $stat.stats.dataInBytes/$units
-        $report[$jobName]['cloudDataWritten'] = $stat.stats.cloudDataWrittenBytes/$units
-        $report[$jobName]['storageConsumed'] = $stat.stats.storageConsumedBytes/$units
+        $report[$jobName]['dataIn'] = [math]::Round(($stat.stats.dataInBytes/$units), 2)
+        $report[$jobName]['cloudDataWritten'] = [math]::Round(($stat.stats.cloudDataWrittenBytes/$units), 2)
+        $report[$jobName]['storageConsumed'] = [math]::Round(($stat.stats.storageConsumedBytes/$units), 2)
     }
 }
 
