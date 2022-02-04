@@ -209,7 +209,7 @@ if ($exportHTML) {
     <table>
     <tr style="background-color: #F1F1F1;">
         <th>Customer Name</th>
-        <th>Customer Agreemente</th>
+        <th>Customer Agreement</th>
         <th>Protection Group</th>
         <th>Environment</th>
         <th>Protected Object Count</th>
