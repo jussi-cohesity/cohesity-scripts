@@ -216,7 +216,7 @@ try {
 
 Write-Host "Calculating Exchange Archive Mailbox sizes" -ForegroundColor Yellow
 $firstInterval = 500
-$skipInterval = $firstInterval
+$skipInternval = $firstInterval
 $archiveMailBoxSize = 0
 
 $archiveMailboxes = Get-ExoMailbox -Archive -ResultSize Unlimited
