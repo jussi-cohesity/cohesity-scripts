@@ -9,7 +9,6 @@ param (
     [Parameter(Mandatory = $True)][string]$vip, 
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter()][string]$domain = 'local',
-    [Parameter()][switch]$exportHTML
     )
 
 ### source the cohesity-api helper code 
@@ -23,9 +22,6 @@ try {
     exit
 }
 
-### Get mSec time for days 
-$date = [DateTime]::Today.AddHours(23).AddMinutes(59).AddSeconds(59)
-$endTimeMsecs = [DateTimeOffset]::new($date).ToUnixTimeMilliSeconds()
 $today = Get-Date -Format "dd.MM.yyyy"
 
 ### Add headers to export-file
