@@ -11,7 +11,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$cluster, 
     [Parameter(Mandatory = $True)][string]$username,
-    [Parameter()][string]$domain = 'local',
+    [Parameter()][string]$domain = 'local'
     )
 
 ### source the cohesity-api helper code 
