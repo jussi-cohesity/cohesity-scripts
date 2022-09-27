@@ -36,7 +36,7 @@ foreach ($stat in $stats.statsList) {
     $tenantName = $stat.groupList.tenantName
     $environment = $stat.protectionEnvironment
     
-    $sourceCount = ($jobs | Where { $_.name -eq $jobname }).sourceIds.count
+    $sourceCount = (api get "protectionRuns?jobId=$($job.id)&numRuns=1").backupRun.sourceBackupStatus.count
 
     $dataIn = $stat.stats.dataInBytes/$units
     $dataInDeduped = $stat.stats.dataInBytesAfterDedup/$units
