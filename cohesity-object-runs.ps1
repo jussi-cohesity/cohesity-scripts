@@ -10,6 +10,8 @@ param (
     [Parameter(Mandatory = $True)][string]$username,
     [Parameter()][string]$domain = 'local',
     [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "GB",
+    [Parameter()][string]$startDate = (Get-Date).AddMonths(-1),
+    [Parameter()][string]$endDate = (get-date)
     [Parameter(Mandatory = $true)][string]$object
     )
 
@@ -32,7 +34,7 @@ $jobs = (api get "data-protect/search/objects?searchString=$($object)&includeTen
 
 foreach ($job in $jobs) {
     $jobId = $job.id.split(':')[2]
-    $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
+    $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true&startTimeUsecs=$(dateToUsecs $startDate)&endTimeUsecs=$(dateToUsecs $endDate)").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
     if ($runs) {
         "`n$($clusterName): $global:object ($($job.name))`n"
         "Start Time          End Time            Read ($unit)    Logical Size ($unit)"
