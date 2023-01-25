@@ -1,6 +1,9 @@
 ### Example script to list all protection run details for object - Jussi Jaurola <jussi@cohesity.com>
 
-### Note! You need to have cohesity-api.ps1 on same directory!
+### Note! 
+### 1) You need to have cohesity-api.ps1 on same directory!
+### 2) startDate & endDate format YYYY-MM-DD 
+###
 
 
 ### process commandline arguments
