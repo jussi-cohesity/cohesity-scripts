@@ -33,20 +33,22 @@ $units = "1" + $unit
 $jobs = (api get "data-protect/search/objects?searchString=$($object)&includeTenants=true" -v2).objects.objectProtectionInfos.protectionGroups
 
 foreach ($job in $jobs) {
-    $jobId = $job.id.split(':')[2]
-    $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true&startTimeUsecs=$(dateToUsecs $startDate)&endTimeUsecs=$(dateToUsecs $endDate)").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
-    if ($runs) {
-        "`n$($clusterName): $global:object ($($job.name))`n"
-        "Start Time          End Time            Read ($unit)    Logical Size ($unit)"
-        "------------------  ------------------  ---------    -----------------"   
-        foreach ($run in $runs) {
-            $runStart = $run.startTimeUsecs
-            $runEnd = $run.endTimeUsecs
-            $objectRunStart = (usecsToDate $runStart).ToString("MM/dd/yyyy hh:mmtt")
-            $objectRunEnd = (usecsToDate $runEnd).ToString("MM/dd/yyyy hh:mmtt")
-            $objectRead = [math]::Round($run.totalBytesReadFromSource/$units,2)
-            $objectLogicalSize = [math]::Round($run.totalLogicalBackupSizeBytes/$units,2)
-            "{0,-19} {1,-19} {2,-12} {3,-2}" -f $objectRunStart, $objectRunEnd, $objectRead, $objectLogicalSize
+    if ($job.id) {
+        $jobId = $job.id.split(':')[2]
+        $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true&startTimeUsecs=$(dateToUsecs $startDate)&endTimeUsecs=$(dateToUsecs $endDate)").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
+        if ($runs) {
+            "`n$($clusterName): $global:object ($($job.name))`n"
+            "Start Time          End Time            Read ($unit)    Logical Size ($unit)"
+            "------------------  ------------------  ---------    -----------------"   
+            foreach ($run in $runs) {
+                $runStart = $run.startTimeUsecs
+                $runEnd = $run.endTimeUsecs
+                $objectRunStart = (usecsToDate $runStart).ToString("MM/dd/yyyy hh:mmtt")
+                $objectRunEnd = (usecsToDate $runEnd).ToString("MM/dd/yyyy hh:mmtt")
+                $objectRead = [math]::Round($run.totalBytesReadFromSource/$units,2)
+                $objectLogicalSize = [math]::Round($run.totalLogicalBackupSizeBytes/$units,2)
+                "{0,-19} {1,-19} {2,-12} {3,-2}" -f $objectRunStart, $objectRunEnd, $objectRead, $objectLogicalSize
+            }
         }
     }
 }
