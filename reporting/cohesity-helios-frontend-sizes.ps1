@@ -28,7 +28,7 @@ $endTimeUsecs =  dateToUsecs  (Get-Date -Day 1).Date.AddMonths(-1).AddMillisecon
 
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Customer, Source, Source Size ($unit)"
+Add-Content -Path $export -Value "Customer, Source Name, Source Size ($unit)"
 
 ### Get usage stats
 $units = "1" + $unit
