@@ -27,10 +27,12 @@ try {
 $units = "1" + $unit
 
 "Searching protection runs for object $object. Hang on. This might take long!"
-$jobs = api get protectionJobs
+
+$jobs = (api get "data-protect/search/objects?searchString=$($object)&includeTenants=true" -v2).objects.objectProtectionInfos.protectionGroups
 
 foreach ($job in $jobs) {
-    $runs = ((api get "protectionRuns?jobId=$($job.id)&excludeNonRestoreableRuns=true").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
+    $jobId = $job.id.split(':')[2]
+    $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
     if ($runs) {
         "`n$($clusterName): $global:object ($($job.name))`n"
         "Start Time          End Time            Read ($unit)    Logical Size ($unit)"
