@@ -41,9 +41,9 @@ foreach ($job in $jobs) {
         $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true&startTimeUsecs=$(dateToUsecs $startDate)&endTimeUsecs=$(dateToUsecs $endDate)").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
         if ($runs) {
             "`n$($clusterName): $global:object ($($job.name))`n"
-            "Start Time          End Time            Read ($unit)    Written ($unit)    Logical Size ($unit)"
-            "------------------  ------------------  ---------    ------------    -----------------"   
-            foreach ($run in $runs) {
+            "Start Time          End Time              Read ($unit)    Written ($unit)    Logical ($unit)"
+            "------------------  ------------------    ---------    ------------    ------------"   
+            foreach ($run in $runs) {
                 $runStart = $run.startTimeUsecs
                 $runEnd = $run.endTimeUsecs
                 $objectRunStart = (usecsToDate $runStart).ToString("MM/dd/yyyy hh:mmtt")
@@ -51,7 +51,7 @@ foreach ($job in $jobs) {
                 $objectRead = [math]::Round($run.totalBytesReadFromSource/$units,2)
                 $objectWritten = [math]::Round($run.totalPhysicalBackupSizeBytes/$units,2)
                 $objectLogicalSize = [math]::Round($run.totalLogicalBackupSizeBytes/$units,2)
-                "{0,-19} {1,-19} {2,-12} {3,-12} {4,5}" -f $objectRunStart, $objectRunEnd, $objectRead, $objectWritten, $objectLogicalSize
+                "{0,10}  {1,10} {2,12}    {3,12}    {4,12}" -f $objectRunStart,$objectRunEnd,$objectRead,$objectWritten, $objectLogicalSize          
             }
         }
     }
