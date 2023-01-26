@@ -14,7 +14,7 @@ param (
     [Parameter()][string]$domain = 'local',
     [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "GB",
     [Parameter()][string]$startDate = (Get-Date).AddMonths(-1),
-    [Parameter()][string]$endDate = (get-date)
+    [Parameter()][string]$endDate = (get-date),
     [Parameter(Mandatory = $true)][string]$object
     )
 
@@ -41,16 +41,17 @@ foreach ($job in $jobs) {
         $runs = ((api get "protectionRuns?jobId=$($jobId)&excludeNonRestoreableRuns=true&startTimeUsecs=$(dateToUsecs $startDate)&endTimeUsecs=$(dateToUsecs $endDate)").backupRun.sourceBackupStatus | Where { $_.source.name -eq $object}).stats
         if ($runs) {
             "`n$($clusterName): $global:object ($($job.name))`n"
-            "Start Time          End Time            Read ($unit)    Logical Size ($unit)"
-            "------------------  ------------------  ---------    -----------------"   
+            "Start Time          End Time            Read ($unit)    Written ($unit)    Logical Size ($unit)"
+            "------------------  ------------------  ---------    ------------    -----------------"   
             foreach ($run in $runs) {
                 $runStart = $run.startTimeUsecs
                 $runEnd = $run.endTimeUsecs
                 $objectRunStart = (usecsToDate $runStart).ToString("MM/dd/yyyy hh:mmtt")
                 $objectRunEnd = (usecsToDate $runEnd).ToString("MM/dd/yyyy hh:mmtt")
                 $objectRead = [math]::Round($run.totalBytesReadFromSource/$units,2)
+                $objectWritten = [math]::Round($run.totalPhysicalBackupSizeBytes/$units,2)
                 $objectLogicalSize = [math]::Round($run.totalLogicalBackupSizeBytes/$units,2)
-                "{0,-19} {1,-19} {2,-12} {3,-2}" -f $objectRunStart, $objectRunEnd, $objectRead, $objectLogicalSize
+                "{0,-19} {1,-19} {2,-12} {3,-12} {4,5}" -f $objectRunStart, $objectRunEnd, $objectRead, $objectWritten, $objectLogicalSize
             }
         }
     }
