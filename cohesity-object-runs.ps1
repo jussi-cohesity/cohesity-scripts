@@ -30,7 +30,7 @@ try {
 ### Get usage stats
 $units = "1" + $unit
 
-"Searching protection runs for object(s) $objects. Hang on. This might take long!"
+"Searching protection runs for object(s) [$objects]. Hang on. This might take long!"
 
 foreach ($object in $objects) {
 
@@ -49,8 +49,8 @@ foreach ($object in $objects) {
                     foreach ($run in $runs) {
                         $runStart = $run.startTimeUsecs
                         $runEnd = $run.endTimeUsecs
-                        $objectRunStart = (usecsToDate $runStart).ToString("MM/dd/yyyy hh:mmtt")
-                        $objectRunEnd = (usecsToDate $runEnd).ToString("MM/dd/yyyy hh:mmtt")
+                        $objectRunStart = (usecsToDate $runStart).ToString("yyyy-MM-dd hh:mmtt")
+                        $objectRunEnd = (usecsToDate $runEnd).ToString("yyyy-MM-dd hh:mmtt")
                         $objectRead = [math]::Round($run.totalBytesReadFromSource/$units,2)
                         $objectWritten = [math]::Round($run.totalPhysicalBackupSizeBytes/$units,2)
                         $objectLogicalSize = [math]::Round($run.totalLogicalBackupSizeBytes/$units,2)
