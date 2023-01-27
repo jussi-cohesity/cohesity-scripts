@@ -9,7 +9,8 @@
 param (
     [Parameter(Mandatory = $True, ValueFromPipeline)][string[]]$vcenters,
     [Parameter(Mandatory = $True)][string]$vmwareCred,
-    [Parameter(Mandatory = $false)][string]$export
+    [Parameter(Mandatory = $false)][string]$export,
+    [Parameter(Mandatory = $False, ValueFromPipeline)][string[]]$vms,
 )
 
 Write-Host "Importing credentials from credential file $($vmwareCred)" -ForegroundColor Yellow
@@ -31,7 +32,11 @@ foreach ($vcenter in $vcenters) {
         write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Yellow
     }
 
-    $vms = Get-VM
+    if ($vms) {
+        $vms = Get-VM | Where { $vms -contains $_.Name }
+    } else { 
+        $vms = Get-VM
+    }
 
     foreach ($vm in $vms) {
         $vmFreeGB = 0
