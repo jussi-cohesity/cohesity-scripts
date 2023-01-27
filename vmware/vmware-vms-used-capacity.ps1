@@ -54,7 +54,7 @@ foreach ($vcenter in $vcenters) {
         "{0,25} {1,10}" -f $_.Name,  $_.Value.vmUsedCapacityGB   
 
         if ($export) { 
-            $line = "{0},{1}" -f $_.Name, $_.Value.vmUsedCapacityGB,
+            $line = "{0},{1}" -f $_.Name, $_.Value.vmUsedCapacityGB
             Add-Content -Path $export -Value $line
         }
     }
