@@ -7,7 +7,7 @@
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $True)][string]$vcenter
+    [Parameter(Mandatory = $True)][string]$vcenter,
     [Parameter(Mandatory = $True)][string]$vmwareCred,
     [Parameter(Mandatory = $false)][string]$export
 )
