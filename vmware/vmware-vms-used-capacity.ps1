@@ -10,7 +10,7 @@ param (
     [Parameter(Mandatory = $True, ValueFromPipeline)][string[]]$vcenters,
     [Parameter(Mandatory = $True)][string]$vmwareCred,
     [Parameter(Mandatory = $false)][string]$export,
-    [Parameter(Mandatory = $False, ValueFromPipeline)][string[]]$vms,
+    [Parameter(Mandatory = $False, ValueFromPipeline)][string[]]$vms
 )
 
 Write-Host "Importing credentials from credential file $($vmwareCred)" -ForegroundColor Yellow
