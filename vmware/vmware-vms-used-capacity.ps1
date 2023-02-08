@@ -13,7 +13,7 @@ param (
 )
 
 Write-Host "Importing credentials from credential file $($vmwareCred)" -ForegroundColor Yellow
-Write-Host "Connecting to vCenter $($vcenters)" -ForegroundColor Yellow
+Write-Host "Connecting to vCenter $($vcenter)" -ForegroundColor Yellow
 
 $vmwareCredential = Import-Clixml -Path ($vmwareCred)
 $report = @{}
