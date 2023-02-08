@@ -7,13 +7,13 @@
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $True, ValueFromPipeline)][string[]]$vcenters,
+    [Parameter(Mandatory = $True)][string]$vcenter
     [Parameter(Mandatory = $True)][string]$vmwareCred,
     [Parameter(Mandatory = $false)][string]$export
 )
 
 Write-Host "Importing credentials from credential file $($vmwareCred)" -ForegroundColor Yellow
-Write-Host "Connecting to vCenter(s) [$($vcenters)]" -ForegroundColor Yellow
+Write-Host "Connecting to vCenter $($vcenters)" -ForegroundColor Yellow
 
 $vmwareCredential = Import-Clixml -Path ($vmwareCred)
 $report = @{}
@@ -22,11 +22,10 @@ if ($export) {
     Add-Content -Path $export -Value "Object, Object Used Capacity (GB)"
 }
 
-foreach ($vcenter in $vcenters) {
+
     try {
-        Connect-VIServer -Server $($_.Value.vCenter) -Credential $vmwareCredential
+        Connect-VIServer -Server $($vCenter) -Credential $vmwareCredential
         Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
-        $connectedVcenter = $_.Value.vCenter
     } catch {
         write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Yellow
     }
@@ -58,4 +57,4 @@ foreach ($vcenter in $vcenters) {
             Add-Content -Path $export -Value $line
         }
     }
-}
+
