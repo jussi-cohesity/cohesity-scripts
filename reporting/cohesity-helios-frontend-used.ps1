@@ -100,6 +100,7 @@ foreach ($cluster in $clusters.name) {
                 $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
                 $report[$sourcename]['sourceSizeBytes'] = $sourceSizeBytes
+                $report[$sourcename]['sourceUsedBytes'] = $sourceSizeBytes
             }     
         }
       
