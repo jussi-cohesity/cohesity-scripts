@@ -143,7 +143,7 @@ foreach ($cluster in $clusters.name) {
 ### Export data
 Write-Host "Exporting to $export" -ForegroundColor Yellow
 $report.GetEnumerator() | Sort-Object -Property {$_.Name} | ForEach-Object {
-    $line = "{0},{1},{2},{3}" -f $_.Value.customerName, $_.Name, [[math]::Round($_.Value.sourceUsedBytes/$units,2), math]::Round($_.Value.sourceSizeBytes/$units,2)
+    $line = "{0},{1},{2},{3}" -f $_.Value.customerName, $_.Name, [math]::Round($_.Value.sourceUsedBytes/$units,2), [math]::Round($_.Value.sourceSizeBytes/$units,2)
     Add-Content -Path $export -Value $line
 }
 
