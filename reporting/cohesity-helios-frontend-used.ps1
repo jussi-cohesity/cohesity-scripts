@@ -40,7 +40,6 @@ try {
     Connect-VIServer -Server $($vCenter) -Credential $vmwareCredential
     Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
 
-    apiauth -helios -password $apikey
 } catch {
     write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Red
     exit
