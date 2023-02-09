@@ -128,7 +128,7 @@ foreach ($cluster in $clusters.name) {
                 foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
                     $sourceTotalCapacity += $vdisk.logicalSizeBytes
                 }
-
+                $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
                 $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
                 $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
