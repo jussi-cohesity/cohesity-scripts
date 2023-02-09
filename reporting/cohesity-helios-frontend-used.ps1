@@ -120,20 +120,19 @@ foreach ($cluster in $clusters.name) {
         foreach ($run in $runs) {        
             foreach($source in $run.backupRun.sourceBackupStatus) {
 
+                $sourcename = $source.source.name
                 ### Get source size
-                $sourceFromObjects = $objects | Where { $_.name -eq $source}
+                $sourceFromObjects = $objects | Where { $_.name -eq $sourceName}
                 $sourceTotalCapacity = 0
 
                 foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
                     $sourceTotalCapacity += $vdisk.logicalSizeBytes
                 }
 
-                $sourcename = $source.source.name
-                if($sourcename -in $report.Keys) {
-                    $report[$sourcename]['customerName'] = $customerName
-                    $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
-                    $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
-                }
+                $report[$sourcename]['customerName'] = $customerName
+                $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
+                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
+                
             }
         }       
     }
