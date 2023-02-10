@@ -5,15 +5,18 @@
 ###   You need to have VMware PowerCLI installed before using this script
 ##
 ## To create encrypted credential file: Get-Credential | Export-Clixml vmware_credentials.xml
-
+##
+## vCentersCSV file should look like this:
+## vcenter,credentialsfile
+## vcenter01,vcenter01-credentials.xml
+## vcenter02,vcenter02-credentials.xml
 
 
 ### process commandline arguments
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $True)][string]$apikey,
-    [Parameter(Mandatory = $True)][string]$vcenter,
-    [Parameter(Mandatory = $True)][string]$vmwareCred,
+    [Parameter(Mandatory = $True)][string]$vCentersCSV,
     [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "GB",
     [Parameter(Mandatory = $true)][string]$export
     )
@@ -31,23 +34,6 @@ try {
     exit
 }
 
-### Connect to vCenter
-try {
-    Write-Host "Importing credentials from credential file $($vmwareCred)" -ForegroundColor Yellow
-    $vmwareCredential = Import-Clixml -Path ($vmwareCred)
-
-    Write-Host "Connecting to vCenter $($vcenter)" -ForegroundColor Yellow
-    Connect-VIServer -Server $($vCenter) -Credential $vmwareCredential
-    Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
-
-} catch {
-    write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Red
-    exit
-}
-
-$startTimeUsecs = dateToUsecs (Get-Date -Day 1).Date.AddMonths(-1)
-$endTimeUsecs =  dateToUsecs  (Get-Date -Day 1).Date.AddMonths(-1).AddMilliseconds(-1).Date.AddMonths(1)
-
 
 ### Add headers to export-file
 Add-Content -Path $export -Value "Customer, Source Name, Source Used ($unit), Source Size ($unit)"
@@ -59,21 +45,39 @@ $clusters = heliosClusters | Select-Object -Property name
 $report = @{}
 $vmObjects = @{}
 
-### Get VM used disk trough vCenter api
-$vms = Get-VM   
+### Connect to each vCenter and get list of VMs
 
-foreach ($vm in $vms) {
-    $vmFreeGB = 0
-    $vmCapacityGB = 0
-    foreach ($disk in $($vm.guest.disks)) {
-        $vmFreeGB += $disk.FreeSpaceGB
-        $vmCapacityGB += $disk.CapacityGB
+$vcenters = Import-Csv ($vCentersCSV)
+foreach ($vcenter in $vcenters) {
+    try {
+        Write-Host "Importing credentials for $($vcenter.vcenter) from file $($vcenter.credentialsfile)" -ForegroundColor Yellow
+        $vmwareCredential = Import-Clixml -Path ($vcenter.credentialsfile)
+
+        Write-Host "Connecting to vCenter $($vcenter.vcenter)" -ForegroundColor Yellow
+        Connect-VIServer -Server $($vcenter.vcenter) -Credential $($vcenter.credentialsfile)
+        Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
+
+    } catch {
+        write-host "Cannot connect to VMware vCenter $($_.Value.vCenter)" -ForegroundColor Red
+        exit
     }
-    $vmUsedCapacityGB = [math]::Round(($vmCapacityGB - $vmFreeGB), 2) 
-    if($vm -notin $vmObjects.Keys){
-        $vmObjects[$vm] = @{}
-        $vmObjects[$vm]['vmUsedCapacity'] = $vmUsedCapacityGB*1024*1024*1024
-    } 
+    
+    ### Get VM used disk trough vCenter api
+    $vms = Get-VM   
+
+    foreach ($vm in $vms) {
+        $vmFreeGB = 0
+        $vmCapacityGB = 0
+        foreach ($disk in $($vm.guest.disks)) {
+            $vmFreeGB += $disk.FreeSpaceGB
+            $vmCapacityGB += $disk.CapacityGB
+        }
+        $vmUsedCapacityGB = [math]::Round(($vmCapacityGB - $vmFreeGB), 2) 
+        if($vm -notin $vmObjects.Keys){
+            $vmObjects[$vm] = @{}
+            $vmObjects[$vm]['vmUsedCapacity'] = $vmUsedCapacityGB*1024*1024*1024
+        } 
+    }    
 }
 
 foreach ($cluster in $clusters.name) {
@@ -102,12 +106,10 @@ foreach ($cluster in $clusters.name) {
                 $report[$sourcename]['sourceUsedBytes'] = $sourceSizeBytes
             }     
         }
-      
     }
 
     Write-Host "    Getting Object Stats for VMware Backups" -ForegroundColor Yellow
     $objects = api get protectionSources/objects | Where { $_.environment -eq 'kVMware'}
-
 
     $jobs = api get "data-protect/protection-groups?isDeleted=false&includeTenants=true&includeLastRunInfo=true&environments=kVMware" -v2
 
