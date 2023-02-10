@@ -46,7 +46,6 @@ $report = @{}
 $vmObjects = @{}
 
 ### Connect to each vCenter and get list of VMs
-
 $vcenters = Import-Csv ($vCentersCSV)
 foreach ($vcenter in $vcenters) {
     try {
@@ -66,6 +65,7 @@ foreach ($vcenter in $vcenters) {
     $vms = Get-VM   
 
     foreach ($vm in $vms) {
+        $vmName = $vm.name
         $vmFreeGB = 0
         $vmCapacityGB = 0
         foreach ($disk in $($vm.guest.disks)) {
@@ -73,13 +73,14 @@ foreach ($vcenter in $vcenters) {
             $vmCapacityGB += $disk.CapacityGB
         }
         $vmUsedCapacityGB = [math]::Round(($vmCapacityGB - $vmFreeGB), 2) 
-        if($vm -notin $vmObjects.Keys){
-            $vmObjects[$vm] = @{}
-            $vmObjects[$vm]['vmUsedCapacity'] = $vmUsedCapacityGB*1024*1024*1024
+        if($vmName -notin $vmObjects.Keys){
+            $vmObjects[$vmName] = @{}
+            $vmObjects[$vmName]['vmUsedCapacity'] = $vmUsedCapacityGB*1024*1024*1024
         } 
     }    
 }
 
+## Collect remaining statistics trough Cohesity Helios
 foreach ($cluster in $clusters.name) {
     ## Conenct to cluster
     Write-Host "Connecting cluster $cluster" -ForegroundColor Yellow
@@ -130,11 +131,11 @@ foreach ($cluster in $clusters.name) {
                 foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
                     $sourceTotalCapacity += $vdisk.logicalSizeBytes
                 }
+                
                 $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
                 $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
-                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity'].ToString()
-                
+                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
             }
         }       
     }
