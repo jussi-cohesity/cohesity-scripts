@@ -135,7 +135,13 @@ foreach ($cluster in $clusters.name) {
                 $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
                 $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
-                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
+                
+                ### If there is no VMware response for object zero used bytes value
+                if ($vmObjects[$sourcename]['vmUsedCapacity']) {
+                    $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
+                } else {
+                    $report[$sourcename]['sourceUsedBytes'] = 0
+                }
             }
         }       
     }
