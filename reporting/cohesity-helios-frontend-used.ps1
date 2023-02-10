@@ -53,7 +53,7 @@ foreach ($vcenter in $vcenters) {
         $vmwareCredential = Import-Clixml -Path ($vcenter.credentialsfile)
 
         Write-Host "Connecting to vCenter $($vcenter.vcenter)" -ForegroundColor Yellow
-        Connect-VIServer -Server $($vcenter.vcenter) -Credential $($vcenter.credentialsfile)
+        Connect-VIServer -Server $($vcenter.vcenter) -Credential $vmwareCredential
         Write-Host "Connected to VMware vCenter $($global:DefaultVIServer.Name)" -ForegroundColor Yellow
 
     } catch {
