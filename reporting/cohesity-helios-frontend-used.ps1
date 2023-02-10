@@ -133,7 +133,7 @@ foreach ($cluster in $clusters.name) {
                 $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
                 $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
-                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
+                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity'].ToString()
                 
             }
         }       
