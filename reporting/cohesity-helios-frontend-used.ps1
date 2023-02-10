@@ -119,7 +119,7 @@ foreach ($cluster in $clusters.name) {
         $jobId = $job.id.split(':')[2]
         $customerName = $job.name.split('_')[0]
         Write-Host "        Collecting stats for object from Protection Group $($job.name)" -ForegroundColor Yellow
-        $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=false
+        $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=true
         foreach ($run in $runs) {        
             foreach($source in $run.backupRun.sourceBackupStatus) {
 
