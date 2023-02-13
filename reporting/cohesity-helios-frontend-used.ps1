@@ -114,7 +114,7 @@ foreach ($cluster in $clusters.name) {
     
     foreach ($object in $objects) {
         $sourceName = $object.name
-        $customerName = (api get "data-protect/search/objects?searchString=$($sourceName)&includeTenants=true&count=5" -v2).objects.objectProtectionInfos.protectionGroups.name.split('_')[0] | Select-Object -First 1
+        $customerName = (api get "restore/objects?search=$sourceName&environments=kVMware").objectSnapshotInfo.jobName.split('_')
         
         if ($customerName) {
             Write-Host "        Collecting status for object $sourceName" -ForegroundColor Yellow
