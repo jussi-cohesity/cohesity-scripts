@@ -111,39 +111,31 @@ foreach ($cluster in $clusters.name) {
 
     Write-Host "    Getting Object Stats for VMware Backups" -ForegroundColor Yellow
     $objects = api get protectionSources/objects | Where { $_.environment -eq 'kVMware'}
-
-    $jobs = api get "data-protect/protection-groups?isDeleted=false&includeTenants=true&includeLastRunInfo=true&environments=kVMware" -v2
-
-    foreach ($job in $jobs.protectionGroups) {
-        $jobName = $job.name
-        $jobId = $job.id.split(':')[2]
-        $customerName = $job.name.split('_')[0]
-        Write-Host "        Collecting stats for object from Protection Group $($job.name)" -ForegroundColor Yellow
-        $runs = api get protectionRuns?jobId=$($jobId)`&excludeNonRestoreableRuns=true
-        foreach ($run in $runs) {        
-            foreach($source in $run.backupRun.sourceBackupStatus) {
-
-                $sourcename = $source.source.name
-                ### Get source size
-                $sourceFromObjects = $objects | Where { $_.name -eq $sourceName}
-                $sourceTotalCapacity = 0
-
-                foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
-                    $sourceTotalCapacity += $vdisk.logicalSizeBytes
-                }
-                
-                $report[$sourcename] = @{}
-                $report[$sourcename]['customerName'] = $customerName
-                $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
-                
-                ### If there is no VMware response for object zero used bytes value
-                if ($vmObjects[$sourcename]['vmUsedCapacity']) {
-                    $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
-                } else {
-                    $report[$sourcename]['sourceUsedBytes'] = 0
-                }
+    
+    foreach ($object in $objects) {
+        $sourceName = $object.name
+        $customerName = (api get "data-protect/search/objects?searchString=$($sourceName)&includeTenants=true&count=5" -v2).objects.objectProtectionInfos.protectionGroups.name.split('_')[0] | Select-Object -First 1
+        
+        if ($customerName) {
+            Write-Host "        Collecting status for object $sourceName" -ForegroundColor Yellow
+            $sourceTotalCapacity = 0
+            foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
+                $sourceTotalCapacity += $vdisk.logicalSizeBytes
             }
-        }       
+                
+            $report[$sourcename] = @{}
+            $report[$sourcename]['customerName'] = $customerName
+            $report[$sourcename]['sourceSizeBytes'] = $sourceTotalCapacity
+            
+            ### If there is no VMware response for object zero used bytes value
+            if ($vmObjects[$sourcename]['vmUsedCapacity']) {
+                $report[$sourcename]['sourceUsedBytes'] = $vmObjects[$sourcename]['vmUsedCapacity']
+            } else {
+                $report[$sourcename]['sourceUsedBytes'] = 0
+            }
+        } else {
+            Write-Host "        Object $sourceName is not protected. Skipping!" -ForegroundColor Red
+        }
     }
 }
 
