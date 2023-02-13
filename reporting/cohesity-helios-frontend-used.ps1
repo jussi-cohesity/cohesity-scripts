@@ -114,9 +114,12 @@ foreach ($cluster in $clusters.name) {
     
     foreach ($object in $objects) {
         $sourceName = $object.name
-        $customerName = (api get "restore/objects?search=$sourceName&environments=kVMware").objectSnapshotInfo.jobName.split('_')
         
-        if ($customerName) {
+        
+        $search = (api get "restore/objects?search=$sourceName&environments=kVMware")
+      
+        if ($search) {
+            $customerName  = $search.objectSnapshotInfo.jobName.split('_')
             Write-Host "        Collecting status for object $sourceName" -ForegroundColor Yellow
             $sourceTotalCapacity = 0
             foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
