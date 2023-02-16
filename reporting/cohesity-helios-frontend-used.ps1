@@ -44,6 +44,7 @@ $units = "1" + $unit
 $clusters = heliosClusters | Select-Object -Property name
 $report = @{}
 $vmObjects = @{}
+$endTimeUsecs =  dateToUsecs  (Get-Date -Day 1).Date.AddMonths(-1).AddMilliseconds(-1).Date.AddMonths(1)
 
 ### Connect to each vCenter and get list of VMs
 $vcenters = Import-Csv ($vCentersCSV)
@@ -85,8 +86,11 @@ foreach ($cluster in $clusters.name) {
     ## Conenct to cluster
     Write-Host "Connecting cluster $cluster" -ForegroundColor Yellow
     heliosCluster $cluster
-    Write-Host "    Getting Protected Objects" -ForegroundColor Yellow
-   
+    
+    Write-Host "    Getting Protected Objects Details (This will take some time...)" -ForegroundColor Yellow
+    $protectedObjects = (api get "reports/protectionSourcesJobsSummary?endTimeUsecs=$endTimeUsecs&reportType=kProtectionSummaryByObjectTypeReport").protectionSourcesJobsSummary
+    $objects = api get protectionSources/objects | Where { $_.environment -eq 'kVMware'} 
+
     Write-Host "    Getting Object Stats for Physical Backups" -ForegroundColor Yellow
     foreach ($object in ((api get "protectionSources/registrationInfo?useCachedData=true&pruneNonCriticalInfo=true&includeEntityPermissionInfo=true&includeApplicationsTreeInfo=true&allUnderHierarchy=true").rootNodes | Where { $_.rootNode.environment -eq 'kPhysical' })) {
         if ($object.stats.protectedSize) {
@@ -97,8 +101,8 @@ foreach ($cluster in $clusters.name) {
             foreach ($stat in $object.statsByEnv) {
                 $sourceSizeBytes += $stat.protectedSize
             }   
-
-            $customerName = (api get "data-protect/search/objects?searchString=$($sourceName)&includeTenants=true&count=5" -v2).objects.objectProtectionInfos.protectionGroups.name.split('_')[0] | Select-Object -First 1
+            
+            $customerName = ($protectedObjects | Where { $_.protectionSource.name -eq $sourceName }).jobName.split('_')[0]
             if($sourceName -notin $report.Keys){
                 $report[$sourcename] = @{}
                 $report[$sourcename]['customerName'] = $customerName
@@ -109,18 +113,16 @@ foreach ($cluster in $clusters.name) {
     }
 
     Write-Host "    Getting Object Stats for VMware Backups" -ForegroundColor Yellow
-    $objects = api get protectionSources/objects | Where { $_.environment -eq 'kVMware'}
     
-    foreach ($object in $objects) {
-        $sourceName = $object.name
+    foreach ($object in ($protectedObjects | Where { $_.protectionSource.environment -eq 'kVMware' })) {
+        $sourceName = $object.protectionSource.name
         
-        $search = (api get "restore/objects?search=$sourceName&environments=kVMware")
-      
-        if ($search.objectSnapshotInfo.jobName) {
-            $customerName  = $search.objectSnapshotInfo.jobName.split('_')[0]
+        $sourceFromObjects = $objects | Where { $_.name -eq $sourceName}
+        
+        if ($sourceFromObjects) {
             Write-Host "        Collecting status for object $sourceName" -ForegroundColor Yellow
+            $customerName = ($protectedObjects | Where { $_.protectionSource.name -eq $sourceName }).jobName.split('_')[0]
             
-            $sourceFromObjects = $objects | Where { $_.name -eq $sourceName}
             $sourceTotalCapacity = 0
             foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
                 $sourceTotalCapacity += $vdisk.logicalSizeBytes
@@ -136,8 +138,6 @@ foreach ($cluster in $clusters.name) {
             } else {
                 $report[$sourcename]['sourceUsedBytes'] = 0
             }
-        } else {
-            Write-Host "        Object $sourceName is not protected. Skipping!" -ForegroundColor Red
         }
     }
 }
