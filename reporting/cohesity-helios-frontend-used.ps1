@@ -86,8 +86,7 @@ foreach ($cluster in $clusters.name) {
     Write-Host "Connecting cluster $cluster" -ForegroundColor Yellow
     heliosCluster $cluster
     Write-Host "    Getting Protected Objects" -ForegroundColor Yellow
-    $objects = api get protectionSources/objects | Where { $_.environment -eq 'kVMware'} 
-
+   
     Write-Host "    Getting Object Stats for Physical Backups" -ForegroundColor Yellow
     foreach ($object in ((api get "protectionSources/registrationInfo?useCachedData=true&pruneNonCriticalInfo=true&includeEntityPermissionInfo=true&includeApplicationsTreeInfo=true&allUnderHierarchy=true").rootNodes | Where { $_.rootNode.environment -eq 'kPhysical' })) {
         if ($object.stats.protectedSize) {
@@ -120,6 +119,8 @@ foreach ($cluster in $clusters.name) {
         if ($search.objectSnapshotInfo.jobName) {
             $customerName  = $search.objectSnapshotInfo.jobName.split('_')[0]
             Write-Host "        Collecting status for object $sourceName" -ForegroundColor Yellow
+            
+            $sourceFromObjects = $objects | Where { $_.name -eq $sourceName}
             $sourceTotalCapacity = 0
             foreach ($vdisk in $sourceFromObjects.vmWareProtectionSource.virtualDisks) {
                 $sourceTotalCapacity += $vdisk.logicalSizeBytes
