@@ -82,7 +82,6 @@ foreach ($cluster in $cohesityClusters) {
     Write-Host "Connecting cluster $($cluster.cluster)" -ForegroundColor Yellow
 
     try {
-      Write-Host "Connecting to Helios" -ForegroundColor Yellow
       apiauth -vip $($cluster.cluster) -useApikey -password $($cluster.apikey)
     } catch {
       write-host "Cannot connect to Helios with key $apikey" -ForegroundColor Red
