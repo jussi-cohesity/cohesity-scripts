@@ -84,7 +84,11 @@ Write-Host "Building new sourceId list for ProtectionGroup $protectionGroup" -Fo
 $newSourceIds = [System.Collections.ArrayList]::new()
 
 foreach ($aduser in $adusers) {
-    $newSourceIds.Add($($objects[$aduser].objectId))
+    if ($($objects[$aduser].objectId)) {
+        $newSourceIds.Add($($objects[$aduser].objectId))
+    } else {
+        Write-Host "User $aduser doesn't have M365 entitlement, skipping!" -ForegroundColor Red
+    }
 }
 
 ## Update protectiongroup with new sourceId's
