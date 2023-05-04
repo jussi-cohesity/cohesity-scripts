@@ -50,7 +50,7 @@ try {
 
 ### List all objects
 Write-Host "Getting objects for source $protectionSource" -ForegroundColor Yellow
-$availableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } }
+$availableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' }
 
 if (!$availableObjects) {
     Write-Host "Couldnt find any objects to protect. Please check!" -ForegroundColor Red
