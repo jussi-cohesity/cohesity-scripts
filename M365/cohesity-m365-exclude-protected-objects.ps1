@@ -4,19 +4,18 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster, 
-    [Parameter(Mandatory = $True)][string]$cohesityCred, 
+    [Parameter(Mandatory = $True)][string]$apiKey,
     [Parameter(Mandatory = $True)][string]$protectionGroup, #Cohesity ProtectionGroup to pick protected objects
     [Parameter(Mandatory = $True)][string]$autoProtectGroup #Cohesity autoprotection group to add excludes
     )
 
 Get-Module -ListAvailable -Name Cohesity* | Import-Module
 
-Write-Host "Importing credentials from credential file $($cohesityCred)" -ForegroundColor Yellow
 Write-Host "Connecting to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
 
 $Credential = Import-Clixml -Path ($cohesityCred)
 try {
-    Connect-CohesityCluster -Server $cohesityCluster -Credential $Credential
+    Connect-CohesityCluster -Server $cohesityCluster -APIkey $apiKey
     Write-Host "Connected to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
 } catch {
     write-host "Cannot connect to Cohesity cluster $($cohesityCluster)" -ForegroundColor Red
