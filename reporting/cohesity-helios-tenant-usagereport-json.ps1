@@ -90,5 +90,5 @@ $report.GetEnumerator() | ForEach-Object {
     }
 }
 
-Write-Host "Exporting json to $export"
+Write-Host "Exporting json to $export" -ForegroundColor Yellow
 $exportJsonContent | ConvertTo-Json -Depth 9 | Set-Content $export
