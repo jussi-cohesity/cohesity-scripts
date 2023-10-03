@@ -39,7 +39,12 @@ foreach ($protectionGroup in $protectionGroups) {
     }
 }
 
-Write-Host "Added total $($protectedSourceIds.count) protected objects to list!" -ForegroundColor Yellow
+if (!$protectedSourceIds) {
+    Write-Host "No protected objects found. Please check!" -ForegroundColor Red
+    exit
+} else {
+    Write-Host "Added total $($protectedSourceIds.count) protected objects to list!" -ForegroundColor Yellow
+}
 
 ### Get protectiongroup
 
