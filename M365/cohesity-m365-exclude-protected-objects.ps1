@@ -30,15 +30,17 @@ foreach ($protectionGroup in $protectionGroups) {
     $jobProtectedSourceIds = (Get-CohesityProtectionJob -Names $protectionGroup).sourceIds
 
     if (!$jobProtectedSourceIds) {
-        Write-Host "Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
+        Write-Host "    Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
         exit
     } else {
-        Write-Host "Adding $($jobProtectedSourceIds.count) protected sources to list" -ForegroundColor Yellow
+        Write-Host "    Adding $($jobProtectedSourceIds.count) protected sources to list" -ForegroundColor Yellow
         foreach ($protectedSource in $jobProtectedSourceIds) {
             $protectedSourceIds.Add($protectedSource) | out-null
         }
     }
 }
+
+Write-Host "Added total $($protectedSourceIds.count) protected objects to list!" -ForegroundColor Yellow
 
 ### Get protectiongroup
 
