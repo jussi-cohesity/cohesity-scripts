@@ -24,15 +24,19 @@ try {
 
 ### List all protected objects from source ProtectionGroup
 Write-Host "Getting protected objects from ProtectionGroup(s): $($protectionGroups)" -ForegroundColor Yellow
-$protectedSourceIds = 0
+$protectedSourceIds = [System.Collections.ArrayList]::new()
 
 foreach ($protectionGroup in $protectionGroups) {
     $jobProtectedSourceIds = (Get-CohesityProtectionJob -Names $protectionGroup).sourceIds
-    $protectedSourceIds += $jobProtectedSourceIds
 
     if (!$jobProtectedSourceIds) {
         Write-Host "Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
         exit
+    } else {
+        Write-Host "Adding $($jobProtectedSourceIds.count) protected sources to list" -ForegroundColor Yellow
+        foreach ($protectedSource in $jobProtectedSourceIds) {
+            $protectedSourceIds.Add($protectedSource) | out-null
+        }
     }
 }
 
