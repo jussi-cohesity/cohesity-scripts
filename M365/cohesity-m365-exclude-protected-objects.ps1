@@ -31,7 +31,6 @@ foreach ($protectionGroup in $protectionGroups) {
 
     if (!$jobProtectedSourceIds) {
         Write-Host "    Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
-        exit
     } else {
         Write-Host "    Adding $($jobProtectedSourceIds.count) protected sources to list" -ForegroundColor Yellow
         foreach ($protectedSource in $jobProtectedSourceIds) {
