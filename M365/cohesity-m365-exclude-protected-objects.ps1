@@ -5,7 +5,7 @@
 param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster, 
     [Parameter(Mandatory = $True)][string]$apiKey,
-    [Parameter(Mandatory = $True)][string]$protectionGroup, #Cohesity ProtectionGroup to pick protected objects
+    [Parameter(Mandatory = $True)][array]$protectionGroups, #Cohesity ProtectionGroup to pick protected objects
     [Parameter(Mandatory = $True)][string]$autoProtectGroup #Cohesity autoprotection group to add excludes
     )
 
@@ -23,13 +23,17 @@ try {
 }
 
 ### List all protected objects from source ProtectionGroup
-Write-Host "Getting protected objects from $protectionGroup" -ForegroundColor Yellow
+Write-Host "Getting protected objects from ProtectionGroup(s): $($protectionGroups)" -ForegroundColor Yellow
+$protectedSourceIds = 0
 
-$protectedSourceIds = (Get-CohesityProtectionJob -Names $protectionGroup).sourceIds
+foreach ($protectionGroup in $protectionGroups) {
+    $jobProtectedSourceIds = (Get-CohesityProtectionJob -Names $protectionGroup).sourceIds
+    $protectedSourceIds += $jobProtectedSourceIds
 
-if (!$protectedSourceIds) {
-    Write-Host "Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
-    exit
+    if (!$jobProtectedSourceIds) {
+        Write-Host "Source job $protectionGroup doesnt have any objects manually protected. Please check!" -ForegroundColor Red
+        exit
+    }
 }
 
 ### Get protectiongroup
