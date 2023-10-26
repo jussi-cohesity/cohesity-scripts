@@ -38,7 +38,7 @@ foreach ($cluster in $clusters.name) {
     Write-Host "Connecting cluster $cluster" -ForegroundColor Yellow
     heliosCluster $cluster
 
-    Write-Host "    Getting Storage Consumers stats" -ForegroundColor Yellow
+    Write-Host "    Getting Storage Consumers stats from $cluster" -ForegroundColor Yellow
 
     $replicationStats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionPolicy=true&fetchProtectionEnvironment=true&consumerType=kReplicationRuns"
     $viewStats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kViews"
@@ -47,39 +47,60 @@ foreach ($cluster in $clusters.name) {
     
     $tenants = $stats.statsList.groupList.tenantName | Sort-Object | Get-Unique
 
-    foreach ($tenant in $tenants) {
-        $tenantName = $tenant.name
-        $tenantStats = $stats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-        $tenantReplicationStats = $replicationStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-        $tenantViewStats = $viewStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-        $tenantViewProtectionStats = $tenantViewProtectionStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-
-
-        $storageDomainName = $tenantStats[0].groupList.viewBoxName
-
-        $totalReplStats = 0
-        $totalViewStats = 0
-        $tenantStorage = 0
-
-        foreach ($tenantReplicationStat in $tenantReplicationStats) {
-            $totalReplStats += $tenantReplicationStat.stats.storageConsumedBytes
+    if ($tenants) {
+        Write-Host "    Collecting tenants stats" -ForegroundColor Yellow
+    
+        foreach ($tenant in $tenants) {
+            
+            $tenantStats = $stats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
+            $tenantReplicationStats = $replicationStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
+            $tenantViewStats = $viewStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
+            $tenantViewProtectionStats = $tenantViewProtectionStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
+    
+            if ($tenantStats) {
+                $storageDomainName = $tenantStats[0].groupList.viewBoxName
+            } elseif ($tenantReplicationStats) {
+                $storageDomainName = $tenantReplicationStats[0].groupList.viewBoxName
+            } elseif ($tenantViewStats) {
+                $storageDomainName = $tenantViewStats[0].groupList.viewBoxName
+            } 
+    
+            $totalReplStats = 0
+            $totalViewStats = 0
+            $tenantStorage = 0
+    
+            if ($tenantReplicationStats) {
+                Write-host "    Found replication stats for $tenant" -ForegroundColor Yellow
+                foreach ($tenantReplicationStat in $tenantReplicationStats) {
+                    $totalReplStats += $tenantReplicationStat.stats.storageConsumedBytes
+                }
+            } else {
+                Write-host "    No replication stats for $tenant" -ForegroundColor Red
+            }
+    
+            if ($tenantViewStats) {
+                Write-Host "    Found View stats for $tenant" -ForegroundColor Yellow
+                foreach ($tenantViewStat in $tenantViewStats) {
+                    $totalViewStats += $tenantReplicationStat.stats.storageConsumedBytes
+                }
+    
+                foreach ($tenantViewProtectionStat in $tenantViewProtectionStats) {
+                    $totalViewStats += $tenantViewProtectionStat.stats.storageConsumedBytes
+                }
+            } else {
+                Write-Host "    No view stats for $tenant" -ForegroundColor Red
+            }
+    
+            foreach ($tenantStat in $tenantStats) {
+                $tenantStorage += $tenantStat.stats.storageConsumedBytes
+            }
+    
+            # Export content for tenant
+            $line = "{0},{1},{2},{3},{4},{5},{6}" -f $today, $cluster, $tenant, $storageDomainName, [math]::Round(($tenantStorage/$units),1), [math]::Round(($totalReplStats/$units),1), [math]::Round(($totalViewStats/$units),1)
+            Add-Content -Path $export -Value $line
         }
-
-        foreach ($tenantViewStat in $tenantViewStats) {
-            $totalViewStats += $tenantReplicationStat.stats.storageConsumedBytes
-        }
-
-        foreach ($tenantViewProtectionStat in $tenantViewProtectionStats) {
-            $totalViewStats += $tenantViewProtectionStat.stats.storageConsumedBytes
-        }
-
-        foreach ($tenantStat in $tenantStats) {
-            $tenantStorage += $tenantStat.stats.storageConsumedBytes
-        }
-
-        # Export content for tenant
-        $line = "{0},{1},{2},{3},{4},{5},{6}" -f $today, $cluster, $storageDomainName, [math]::Round(($tenantStorage/$units),1), [math]::Round(($totalReplStats/$units),1), [math]::Round(($totalViewStats/$units),1)
-        Add-Content -Path $export -Value $line
+    } else {
+         Write-Host "    No tenant data found for $cluster" -ForegroundColor Red
     }
 }
 
