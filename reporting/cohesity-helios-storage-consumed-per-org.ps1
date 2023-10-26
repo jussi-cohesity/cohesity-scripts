@@ -45,7 +45,7 @@ foreach ($cluster in $clusters.name) {
     $viewProtetionStats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kViewProtectionRuns"
     $stats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
     
-    $tenants = api get tenants
+    $tenants = $stats.statsList.groupList.tenantName | Sort-Object | Get-Unique
 
     foreach ($tenant in $tenants) {
         $tenantName = $tenant.name
