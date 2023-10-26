@@ -52,10 +52,10 @@ foreach ($cluster in $clusters.name) {
     
         foreach ($tenant in $tenants) {
             
-            $tenantStats = $stats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-            $tenantReplicationStats = $replicationStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-            $tenantViewStats = $viewStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
-            $tenantViewProtectionStats = $tenantViewProtectionStats.statsList | Where { $_.groupList.tenantName -eq $tenantName}
+            $tenantStats = $stats.statsList | Where { $_.groupList.tenantName -eq $tenant}
+            $tenantReplicationStats = $replicationStats.statsList | Where { $_.groupList.tenantName -eq $tenant}
+            $tenantViewStats = $viewStats.statsList | Where { $_.groupList.tenantName -eq $tenant}
+            $tenantViewProtectionStats = $tenantViewProtectionStats.statsList | Where { $_.groupList.tenantName -eq $tenant}
     
             if ($tenantStats) {
                 $storageDomainName = $tenantStats[0].groupList.viewBoxName
