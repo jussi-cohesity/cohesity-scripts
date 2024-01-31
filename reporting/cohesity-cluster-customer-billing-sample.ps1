@@ -1,12 +1,15 @@
-### Example script to get storage consumers from helios - Jussi Jaurola <jussi@cohesity.com>
+### Example script to get storage consumers from cluster - Jussi Jaurola <jussi@cohesity.com>
 
 ### Note! You need to have cohesity-api.ps1 on same directory!
 
 
 ### process commandline arguments
+
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $True)][string]$apikey,
+    [Parameter(Mandatory = $True)][string]$cluster, 
+    [Parameter(Mandatory = $True)][string]$username,
+    [Parameter()][string]$domain = 'local',
     [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "TB",
     [Parameter()][int32]$customerPricePerTB = 45,
     [Parameter()][int32]$softwareCostPerTB = 20,
@@ -21,9 +24,10 @@ param (
 . $(Join-Path -Path $PSScriptRoot -ChildPath cohesity-api.ps1)
 
 try {
-    apiauth -helios -password $apikey
+    apiauth -vip $cluster -username $username -domain $domain
+    $clusterName = (api get cluster).name
 } catch {
-    write-host "Cannot connect to Helios with key $apikey" -ForegroundColor Yellow
+    write-host "Cannot connect to cluster $cluster" -ForegroundColor Red
     exit
 }
 
@@ -33,12 +37,7 @@ Add-Content -Path $export -Value "Organisation (OrgID), Data Ingested & Retained
 ### Get usage stats
 $units = "1" + $unit
 $report = @{}
-$clusters = heliosClusters | Select-Object -Property name
 
-foreach ($cluster in $clusters.name) {
-    ## Connect to cluster
-    Write-Host "Connecting cluster $cluster" -ForegroundColor Yellow
-    heliosCluster $cluster
     $tenants = api get tenants
     Write-Host "    Getting Storage Consumers stats" -ForegroundColor Yellow
     $stats = api get "stats/consumers?maxCount=1000&fetchViewBoxName=true&fetchTenantName=true&fetchProtectionEnvironment=true&consumerType=kProtectionRuns"
@@ -74,4 +73,4 @@ foreach ($cluster in $clusters.name) {
         
          Add-Content -Path $export -Value $line
     }
-}
+
