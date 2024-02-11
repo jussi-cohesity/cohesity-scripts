@@ -69,7 +69,7 @@ $report = @{}
          $totalCustomerCost = ($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)
          $customerNetBenefitMargin = ($totalCustomerBilling / $totalCustomerCost) * 100
 
-         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomeCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
+         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
         
          Add-Content -Path $export -Value $line
     }
