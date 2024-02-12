@@ -68,7 +68,7 @@ $report = @{}
              $storageConsumedWithResiliencyAndBuffer =  $storageConsumedWithResiliency * $bufferOverHeadMultiplier
              $dataReduction = ([math]::Round(($dataInBytes/$units),1)) / ([math]::Round(($dataWrittenBytes/$units),1))
              $totalCustomerCost = ($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)
-             $customerNetBenefitMargin = ($totalCustomerBilling / $totalCustomerCost) * 100
+             $customerNetBenefitMargin = ([math]::Round(((($totalCustomerBilling / $totalCustomerCost) * 100)),1))
 
              $line = "{0},{1},{2},{3},{4},{5},{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
         
