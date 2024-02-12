@@ -53,24 +53,28 @@ $report = @{}
 
         Write-Host "        Collecting $tenantName stats" -ForegroundColor Yellow
         $tenantStats = $stats.statsList | where { $_.groupList.tenantName -match $tenantName}
-        foreach ($tenantStat in $tenantStats) {
-            $dataInBytes += $tenantStats.stats.dataInBytes
-            $dataWrittenBytes += $tenantStat.stats.dataWrittenBytes
+        if ($tenantStats) {
+            foreach ($tenantStat in $tenantStats) {
+                $dataInBytes += $tenantStats.stats.dataInBytes
+                $dataWrittenBytes += $tenantStat.stats.dataWrittenBytes
+            }
+
+        
+             # Export content for tenant
+             $dataIngestedAndRetained = [math]::Round(($dataInBytes/$units),1)
+             $totalCustomerBilling = ([math]::Round(($dataInBytes/$units),1)) * $customerPricePerTB
+             $storageConsumedForRetainedData = ([math]::Round(($dataWrittenBytes/$units),1))
+             $storageConsumedWithResiliency = $storageConsumedForRetainedData * $resiliencyOverheadMultiplier
+             $storageConsumedWithResiliencyAndBuffer =  $storageConsumedWithResiliency * $bufferOverHeadMultiplier
+             $dataReduction = ([math]::Round(($dataInBytes/$units),1)) / ([math]::Round(($dataWrittenBytes/$units),1))
+             $totalCustomerCost = ($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)
+             $customerNetBenefitMargin = ($totalCustomerBilling / $totalCustomerCost) * 100
+
+             $line = "{0},{1},{2},{3},{4},{5},{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
+        
+             Add-Content -Path $export -Value $line
+        } else {
+            Write-Host "        No stats found for $tenantName" -ForegroundColor Yellow
         }
-
-        
-         # Export content for tenant
-         $dataIngestedAndRetained = [math]::Round(($dataInBytes/$units),1)
-         $totalCustomerBilling = ([math]::Round(($dataInBytes/$units),1)) * $customerPricePerTB
-         $storageConsumedForRetainedData = ([math]::Round(($dataWrittenBytes/$units),1))
-         $storageConsumedWithResiliency = $storageConsumedForRetainedData * $resiliencyOverheadMultiplier
-         $storageConsumedWithResiliencyAndBuffer =  $storageConsumedWithResiliency * $bufferOverHeadMultiplier
-         $dataReduction = ([math]::Round(($dataInBytes/$units),1)) / ([math]::Round(($dataWrittenBytes/$units),1))
-         $totalCustomerCost = ($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)
-         $customerNetBenefitMargin = ($totalCustomerBilling / $totalCustomerCost) * 100
-
-         $line = "{0},{1},{2},{3},{4},{5},{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
-        
-         Add-Content -Path $export -Value $line
     }
 
