@@ -31,6 +31,11 @@ try {
     exit
 }
 
+### Remove old export-file if exists
+if (Test-Path $export) { 
+    Remove-Item $export 
+}
+
 ### Add headers to export-file
 Add-Content -Path $export -Value "Organisation (OrgID), Data Ingested & Retained ($unit), Total Customer Billing, Total Customer Cost, Customer Net Benefit Margin (%), Data Reduction, Storage Consumed for Retained Data ($unit), Storage Consumed with Resiliency ($unit), Storage Consumed with Resiliency and Buffer ($unit)"
 
