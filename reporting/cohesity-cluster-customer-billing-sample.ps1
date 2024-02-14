@@ -68,11 +68,11 @@ $report = @{}
         
                  # Export content for tenant
                  $dataIngestedAndRetained = [math]::Round(($dataInBytes/$units),1)
-                 $totalCustomerBilling = ([math]::Round(($dataInBytes/$units),1)) * $customerPricePerTB
+                 $totalCustomerBilling = [math]::Round(($dataIngestedAndRetained * $customerPricePerTB),1)
                  $storageConsumedForRetainedData = ([math]::Round(($dataWrittenBytes/$units),1))
                  $storageConsumedWithResiliency = ([math]::Round(($storageConsumedForRetainedData * $resiliencyOverheadMultiplier),1))
                  $storageConsumedWithResiliencyAndBuffer =  ([math]::Round(($storageConsumedWithResiliency * $bufferOverHeadMultiplier),1))
-                 $dataReduction = ([math]::Round(($dataInBytes/$units),1)) / ([math]::Round(($dataWrittenBytes/$units),1))
+                 $dataReduction = [math]::Round(($dataInBytes/$dataWrittenBytes),1)
                  $totalCustomerCost = ([math]::Round((($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)),1))
                  $customerNetBenefitMargin = ([math]::Round(((($totalCustomerBilling / $totalCustomerCost) * 100)),1))
 
