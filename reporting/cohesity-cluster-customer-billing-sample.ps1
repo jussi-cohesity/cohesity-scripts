@@ -60,8 +60,12 @@ $report = @{}
         $tenantStats = $stats.statsList | where { $_.groupList.tenantName -match $tenantName}
         if ($tenantStats) {
             foreach ($tenantStat in $tenantStats) {
-                $dataInBytes += $tenantStats.stats.dataInBytes
-                $dataWrittenBytes += $tenantStat.stats.dataWrittenBytes
+                if ($tenantStat.stats.dataInBytes) {
+                    $dataInBytes += $tenantStat.stats.dataInBytes
+                }
+                if ($tenantStat.stats.dataWrittenBytes) {
+                    $dataWrittenBytes += $tenantStat.stats.dataWrittenBytes
+                }
             }
 
             if ($dataInBytes -gt 0) {
