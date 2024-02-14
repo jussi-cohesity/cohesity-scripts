@@ -80,10 +80,10 @@ $report = @{}
         
                  Add-Content -Path $export -Value $line
             } else {
-                Write-Host "        DataIN found for $tenantName is zero" -ForegroundColor Yellow
+                Write-Host "            DataIN found for $tenantName is zero" -ForegroundColor Yellow
             }
         } else {
-            Write-Host "        No stats found for $tenantName" -ForegroundColor Yellow
+            Write-Host "            No stats found for $tenantName" -ForegroundColor Yellow
         }
     }
 
