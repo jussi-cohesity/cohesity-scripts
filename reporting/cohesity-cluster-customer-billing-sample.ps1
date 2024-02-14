@@ -70,10 +70,10 @@ $report = @{}
                  $dataIngestedAndRetained = [math]::Round(($dataInBytes/$units),1)
                  $totalCustomerBilling = ([math]::Round(($dataInBytes/$units),1)) * $customerPricePerTB
                  $storageConsumedForRetainedData = ([math]::Round(($dataWrittenBytes/$units),1))
-                 $storageConsumedWithResiliency = $storageConsumedForRetainedData * $resiliencyOverheadMultiplier
-                 $storageConsumedWithResiliencyAndBuffer =  $storageConsumedWithResiliency * $bufferOverHeadMultiplier
+                 $storageConsumedWithResiliency = ([math]::Round(($storageConsumedForRetainedData * $resiliencyOverheadMultiplier),1))
+                 $storageConsumedWithResiliencyAndBuffer =  ([math]::Round(($storageConsumedWithResiliency * $bufferOverHeadMultiplier),1))
                  $dataReduction = ([math]::Round(($dataInBytes/$units),1)) / ([math]::Round(($dataWrittenBytes/$units),1))
-                 $totalCustomerCost = ($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)
+                 $totalCustomerCost = ([math]::Round((($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)),1))
                  $customerNetBenefitMargin = ([math]::Round(((($totalCustomerBilling / $totalCustomerCost) * 100)),1))
 
                  $line = "{0};{1};{2};{3};{4};{5};{6}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
