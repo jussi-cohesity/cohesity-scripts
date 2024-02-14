@@ -37,7 +37,7 @@ if (Test-Path $export) {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Organisation (OrgID), Data Ingested & Retained ($unit), Total Customer Billing, Total Customer Cost, Customer Net Benefit Margin (%), Data Reduction, Storage Consumed for Retained Data ($unit), Storage Consumed with Resiliency ($unit), Storage Consumed with Resiliency and Buffer ($unit)"
+Add-Content -Path $export -Value "Organisation (OrgID); Data Ingested & Retained ($unit); Total Customer Billing; Total Customer Cost; Customer Net Benefit Margin (%); Data Reduction; Storage Consumed for Retained Data ($unit); Storage Consumed with Resiliency ($unit); Storage Consumed with Resiliency and Buffer ($unit)"
 
 ### Get usage stats
 $units = "1" + $unit
