@@ -37,7 +37,7 @@ if (Test-Path $export) {
 }
 
 ### Add headers to export-file
-Add-Content -Path $export -Value "Organisation (OrgID); Data Ingested & Retained ($unit); Total Customer Billing; Total Customer Cost; Customer Net Benefit Margin (%); Data Reduction; Storage Consumed for Retained Data ($unit); Storage Consumed with Resiliency ($unit); Storage Consumed with Resiliency and Buffer ($unit)"
+Add-Content -Path $export -Value "Organisation (OrgID); Organisation Name; Data Ingested & Retained ($unit); Total Customer Billing; Total Customer Cost; Customer Net Benefit Margin (%); Data Reduction; Storage Consumed for Retained Data ($unit); Storage Consumed with Resiliency ($unit); Storage Consumed with Resiliency and Buffer ($unit)"
 
 ### Get usage stats
 $units = "1" + $unit
@@ -80,7 +80,7 @@ $report = @{}
                  $totalCustomerCost = ([math]::Round((($softwareCostPerTB * $dataIngestedAndRetained) + ($storageConsumedWithResiliencyAndBuffer * $hardwareCostPerTB)),1))
                  $customerNetBenefitMargin = ([math]::Round(((($totalCustomerBilling / $totalCustomerCost) * 100)),1))
 
-                 $line = "{0};{1};{2};{3};{4};{5};{6};{7};{8}" -f $tenantId, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
+                 $line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}" -f $tenantId, $tenantName, $dataIngestedAndRetained, $totalCustomerBilling, $totalCustomerCost, $customerNetBenefitMargin, $dataReduction, $storageConsumedForRetainedData, $storageConsumedWithResiliency, $storageConsumedWithResiliencyAndBuffer
         
                  Add-Content -Path $export -Value $line
             } else {
@@ -90,4 +90,3 @@ $report = @{}
             Write-Host "            No stats found for $tenantName" -ForegroundColor Yellow
         }
     }
-
