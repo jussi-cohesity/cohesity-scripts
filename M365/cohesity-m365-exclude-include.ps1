@@ -1,4 +1,4 @@
-### Example script include/exclude users with ADgroups and/or smtp domains or sites for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
+### Example script include/exclude users with ADgroups, users with smtp-domains, sites or teams for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
 
 ### process commandline arguments
 [CmdletBinding()]
