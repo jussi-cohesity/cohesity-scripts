@@ -1,4 +1,4 @@
-### Example script include/exclude users with ADgroups and/or smtp domains for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
+### Example script include/exclude users with ADgroups and/or smtp domains or sites for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
 
 ### process commandline arguments
 [CmdletBinding()]
@@ -11,7 +11,10 @@ param (
     [Parameter(Mandatory = $False)][array]$excludeAdGroups,
     [Parameter(Mandatory = $False)][array]$includeAdGroups,
     [Parameter(Mandatory = $False)][array]$excludeSMTPdomains,
-    [Parameter(Mandatory = $False)][array]$includeSMTPdomains
+    [Parameter(Mandatory = $False)][array]$includeSMTPdomains,
+    [Parameter(Mandatory = $False)][array]$includeSites,
+    [Parameter(Mandatory = $False)][array]$excludeSites
+
     )
 
 Get-Module -ListAvailable -Name Cohesity* | Import-Module
@@ -42,14 +45,14 @@ Write-Host "Source $protectionSource refreshed. Sleeping for $waitTimeSecs secon
 Start-Sleep -s $waitTimeSecs
 
 Write-Host "Getting all available objects for source $($protectionSource)" -ForegroundColor Yellow
-$allAvailableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' }
+$allAvailableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) }
 
 
 $includeDefined = $False
 $excludeDefined = $False
 
-$excludeUsers = [System.Collections.ArrayList]::new()
-$includeUsers = [System.Collections.ArrayList]::new()
+$excludeIds = [System.Collections.ArrayList]::new()
+$includeIds = [System.Collections.ArrayList]::new()
 
 if ($excludeAdGroups) {
     $exludeDefined = $True
@@ -61,7 +64,7 @@ if ($excludeAdGroups) {
     
         foreach ($user in $users) {
             $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $excludeUsers.Add($userId) | out-null
+            $excludeIds.Add($userId) | out-null
         }
     }
 }
@@ -75,7 +78,7 @@ if ($excludeSMTPdomains) {
         $users = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
 
         foreach ($user in $users) {
-            $excludeUsers.Add($user.id) | out-null
+            $excludeIds.Add($user.id) | out-null
         }
 
     }
@@ -92,7 +95,7 @@ if ($includeAdGroups) {
     
         foreach ($user in $users) {
             $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $includeUsers.Add($userId) | out-null
+            $includeIds.Add($userId) | out-null
         }
     }
 }
@@ -107,23 +110,49 @@ if ($includeSMTPdomains) {
         $users = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
 
         foreach ($user in $users) {
-            $includeUsers.Add($user.id) | out-null
+            $includeIds.Add($user.id) | out-null
         }
     }
+}
+
+if ($includeSites) {
+    $includeDefined = $True
+
+    Write-Host "Including sites defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor
+
+    foreach ($includeSite in $includeSites) {
+        site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        $includeIds.Add($site.id) | out-null
+    }
+
+}
+
+if ($excludeSites) {
+    $excludeDefined = $True
+
+    Write-Host "Excluding sites defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for site(s): $($excludeSites)" -ForegroundColor Yellow
+
+    foreach ($excludeSite in $excludeSites) {
+        site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        $excludeIds.Add($site.id) | out-null
+    }
+
 }
 
 if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Getting information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     $job = Get-CohesityProtectionJob -Names $protectionGroup
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
-    if ($includeUsers) {
-        Write-Host "    Including $($includeUsers.count) users" -ForegroundColor Yellow
-        $job.sourceIds = $includeUsers
+    if ($includeIds) {
+        Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
+        $job.sourceIds = $includeIds
     }
 
-    if ($excludeUsers) {
-        Write-Host "    Excluding $($excludeUsers.count) users" -ForegroundColor Yellow
-        $job.excludeSourceIds = $excludeUsers
+    if ($excludeIds) {
+        Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
+        $job.excludeSourceIds = $excludeIds
     }
 
     try { 
