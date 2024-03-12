@@ -127,7 +127,7 @@ if (($includeDefined) -or ($excludeDefined)) {
     }
 
     try { 
-        Set-CohesityProtectionJob -ProtectionJob $protectionGroup -Confirm:$false     
+        Set-CohesityProtectionJob -ProtectionJob $job -Confirm:$false     
     } catch {
         write-host "Cannot update protectiongroup $protectionGroup" -ForegroundColor Red
         exit
