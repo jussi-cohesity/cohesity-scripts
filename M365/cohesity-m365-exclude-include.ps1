@@ -13,7 +13,9 @@ param (
     [Parameter(Mandatory = $False)][array]$excludeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSites,
-    [Parameter(Mandatory = $False)][array]$excludeSites
+    [Parameter(Mandatory = $False)][array]$excludeSites,
+    [Parameter(Mandatory = $False)][array]$includeTeams,
+    [Parameter(Mandatory = $False)][array]$excludeTeams,
 
     )
 
@@ -122,7 +124,7 @@ if ($includeSites) {
     Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor
 
     foreach ($includeSite in $includeSites) {
-        site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        $site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
         $includeIds.Add($site.id) | out-null
     }
 
@@ -135,10 +137,36 @@ if ($excludeSites) {
     Write-Host "    Getting IDs for site(s): $($excludeSites)" -ForegroundColor Yellow
 
     foreach ($excludeSite in $excludeSites) {
-        site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        $site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
         $excludeIds.Add($site.id) | out-null
     }
 
+}
+
+if ($includeTeams) {
+    $includeDefined = $True
+
+    Write-Host "Including teams defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for teams(s): $($includeTeams)" -ForegroundColor
+
+    foreach ($includeTeam in $includeTeams) {
+        $teams = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
+        $includeIds.Add($teams.id) | out-null
+    }
+
+}
+
+if ($excludeTeams) {
+    $excludeDefined = $True
+
+    Write-Host "Excluding teams defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor
+
+    foreach ($includeTeam in $includeTeams) {
+        $teams = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
+        $excludeIds.Add($teams.id) | out-null
+    }
+    
 }
 
 if (($includeDefined) -or ($excludeDefined)) {
