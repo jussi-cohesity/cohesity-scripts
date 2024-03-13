@@ -62,7 +62,9 @@ if ($excludeAdGroups) {
     Write-Host "    Getting users from AD group(s): $($excludeAdGroups)" -ForegroundColor Yellow
 
     foreach ($exlucedeAdGroup in $excludeAdGroups) {
-        $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        $adGroup = $excludeAdGroup -split "@"[0]
+        $adDomain = $excludeAdGroup -split "@"[1]
+        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
             $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
@@ -93,7 +95,9 @@ if ($includeAdGroups) {
     Write-Host "    Getting users from AD group(s): $($includeAdGroups)" -ForegroundColor Yellow
 
     foreach ($includeAdGroup in $includeAdGroups) {
-        $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        $adGroup = $includeAdGroup -split "@"[0]
+        $adDomain = $includeAdGroup -split "@"[1]
+        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
             $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
