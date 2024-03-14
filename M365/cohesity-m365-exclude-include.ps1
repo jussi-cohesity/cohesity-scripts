@@ -61,7 +61,7 @@ if ($excludeAdGroups) {
     Write-Host "Exclude AG groups defined" -ForegroundColor Yellow
     Write-Host "    Getting users from AD group(s): $($excludeAdGroups)" -ForegroundColor Yellow
 
-    foreach ($exlucedeAdGroup in $excludeAdGroups) {
+    foreach ($excludeAdGroup in $excludeAdGroups) {
         $adGroup = $excludeAdGroup -split "@"[0]
         $adDomain = $excludeAdGroup -split "@"[1]
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
@@ -179,12 +179,21 @@ if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     if ($includeIds) {
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
-        $job.sourceIds = $includeIds
+        if ($job.sourceIds) {
+            $job.sourceIds = $includeIds
+        } else {
+            $job.sourceIds = [System.Collections.ArrayList]::new()
+            $job.sourceIds = $includeIds
+        }
     }
 
     if ($excludeIds) {
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
-        $job.excludeSourceIds = $excludeIds
+        if ($job.excludeSourceIds) {
+            $job.excludeSourceIds = $excludeIds
+        } else {
+            $job.excludeSourceIds = [System.Collections.ArrayList]::new()
+            $job.excludeSourceIds = $excludeIds
     }
 
     try { 
