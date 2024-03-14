@@ -10,6 +10,8 @@ param (
     [Parameter(Mandatory = $False)][string]$waitTimeSecs = 60,
     [Parameter(Mandatory = $False)][array]$excludeAdGroups,
     [Parameter(Mandatory = $False)][array]$includeAdGroups,
+    [Parameter(Mandatory = $False)][array]$excludeAds,
+    [Parameter(Mandatory = $False)][array]$includeAds,
     [Parameter(Mandatory = $False)][array]$excludeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSites,
@@ -55,6 +57,40 @@ $excludeDefined = $False
 
 $excludeIds = [System.Collections.ArrayList]::new()
 $includeIds = [System.Collections.ArrayList]::new()
+
+if ($excludeAds) {
+    $excludeDefined = $True
+    Write-Host "Exclude AD(s) defined" -ForegroundColor Yellow
+    Write-Host "    Getting users from AD(s): $($excludeAds)" -ForegroundColor Yellow
+
+    foreach ($excludeAd in $excludeAds) {
+        $users = Get-ADUser -server $excludeAd -Properties EmailAddress | Select EmailAddress
+
+        foreach ($user in $users)
+        {
+            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
+            $excludeIds.Add($userId) | out-null
+        }
+    }
+}
+
+if ($includeAds) {
+    $includeDefined = $True
+
+    Write-Host "Include AD(s) defined" -ForegroundColor Yellow
+    Write-Host "    Getting users from AD(s): $($includeAds)" -ForegroundColor Yellow
+
+    foreach ($includeAd in $includeAds) {
+        $users = Get-ADUser -server $includeAd -Properties EmailAddress | Select EmailAddress
+
+        foreach ($user in $users)
+        {
+            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
+            $includeIds.Add($userId) | out-null
+        }
+    }
+    
+}
 
 if ($excludeAdGroups) {
     $exludeDefined = $True
