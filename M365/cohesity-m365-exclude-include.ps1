@@ -213,6 +213,7 @@ if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Getting information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     $job = Get-CohesityProtectionJob -Names $protectionGroup
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
+    
     if ($includeIds) {
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
@@ -230,6 +231,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         } else {
             $job.excludeSourceIds = [System.Collections.ArrayList]::new()
             $job.excludeSourceIds = $excludeIds
+        }
     }
 
     try { 
