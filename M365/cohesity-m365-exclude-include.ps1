@@ -87,7 +87,9 @@ if ($excludeAds) {
 
         foreach ($user in $users)
         {
-            $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            if ($availableUsers[$user.EmailAddress]) {
+                $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            }
         }
     }
 }
@@ -103,7 +105,9 @@ if ($includeAds) {
 
         foreach ($user in $users)
         {
-            $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            if ($availableUsers[$user.EmailAddress]) {
+                $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            }
         }
     }
     
@@ -120,7 +124,9 @@ if ($excludeAdGroups) {
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
-            $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            if ($availableUsers[$user.EmailAddress]) {
+                $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            }
         }
     }
 }
