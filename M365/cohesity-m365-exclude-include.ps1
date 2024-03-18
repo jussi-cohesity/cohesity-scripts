@@ -57,8 +57,10 @@ $availableSites = @{}
 foreach ($availableUser in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' })) {
     $emailAddress = $availableUser.office365ProtectionSource.primarySMTPAddress
     if ($emailAddress) {
-        $userId = $availableUser.id
-        $availableUsers.Add($emailAddress, $userId)
+        if (!$availableUsers[$emailAddress]) {
+            $userId = $availableUser.id
+            $availableUsers.Add($emailAddress, $userId)
+        }
     }
 }
 
