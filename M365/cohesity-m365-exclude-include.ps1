@@ -7,7 +7,7 @@ param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster,
     [Parameter(Mandatory = $True)][string]$protectionSource, 
     [Parameter(Mandatory = $True)][string]$protectionGroup,
-    [Parameter(Mandatory = $False)][string]$waitTimeSecs = 60,
+    [Parameter(Mandatory = $False)][string]$refreshandwait,
     [Parameter(Mandatory = $False)][array]$excludeAdGroups,
     [Parameter(Mandatory = $False)][array]$includeAdGroups,
     [Parameter(Mandatory = $False)][array]$excludeAds,
@@ -33,20 +33,23 @@ try {
     exit
 }
 
-Write-Host "Refreshing source $protectionSource. This could take long. Please wait!" -ForegroundColor Yellow
-### Get source & Refresh source
-$source = Get-CohesityProtectionSource -Environments kO365 | Where { $_.protectionSource.name -match $protectionSource }
-if (!$source) { 
-    Write-Host "Couldn't find source with name $protectionSource, please check!" -ForegroundColor Red
+if ($refreshandwait) {
+
+    Write-Host "Refreshing source $protectionSource. This could take long. Please wait!" -ForegroundColor Yellow
+    ### Get source & Refresh source
+    $source = Get-CohesityProtectionSource -Environments kO365 | Where { $_.protectionSource.name -match $protectionSource }
+    if (!$source) { 
+        Write-Host "Couldn't find source with name $protectionSource, please check!" -ForegroundColor Red
+    }
+    $lastRefresh = $source.registrationInfo.refreshTimeUsecs
+    try {
+        Update-CohesityProtectionSource -Id $($source.protectionSource.id)
+    } catch {
+        Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
+    }
+    Write-Host "Source $protectionSource refreshed. Sleeping for $waitTimeSecs seconds" -ForegroundColor Yellow
+    Start-Sleep -s $waitTimeSecs
 }
-$lastRefresh = $source.registrationInfo.refreshTimeUsecs
-try {
-    Update-CohesityProtectionSource -Id $($source.protectionSource.id)
-} catch {
-    Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
-}
-Write-Host "Source $protectionSource refreshed. Sleeping for $waitTimeSecs seconds" -ForegroundColor Yellow
-Start-Sleep -s $waitTimeSecs
 
 Write-Host "Getting all available objects for source $($protectionSource)" -ForegroundColor Yellow
 $allAvailableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) }
@@ -55,14 +58,18 @@ $availableSites = @{}
 
 foreach ($availableUser in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' })) {
     $emailAddress = $availableUser.office365ProtectionSource.primarySMTPAddress
-    $userId = $availableUser.id
-    $availableUsers.Add($emailAddress, $userId)
+    if ($emailAddress) {
+        $userId = $availableUser.id
+        $availableUsers.Add($emailAddress, $userId)
+    }
 }
 
 foreach ($availableSite in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' })) {
     $siteId = $availableSite.id
     $site = $availableSite.office365ProtectionSource.name
-    $availableSites.Add($site, $siteId)
+    if ($site) {
+        $availableSites.Add($site, $siteId)
+    }
 }
 
 
