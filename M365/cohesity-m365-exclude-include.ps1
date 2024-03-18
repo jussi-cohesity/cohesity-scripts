@@ -87,7 +87,7 @@ if ($excludeAds) {
 
         foreach ($user in $users)
         {
-            if ($availableUsers[$user.EmailAddress]) {
+            if ($availableUsers[$user.EmailAddress.ToString()]) {
                 $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
             }
         }
@@ -105,7 +105,7 @@ if ($includeAds) {
 
         foreach ($user in $users)
         {
-            if ($availableUsers[$user.EmailAddress]) {
+            if ($availableUsers[$user.EmailAddress.ToString()]) {
                 $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
             }
         }
@@ -124,7 +124,7 @@ if ($excludeAdGroups) {
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
-            if ($availableUsers[$user.EmailAddress]) {
+            if ($availableUsers[$user.EmailAddress.ToString()]) {
                 $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
             }
         }
