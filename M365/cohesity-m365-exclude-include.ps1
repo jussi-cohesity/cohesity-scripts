@@ -219,8 +219,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         if ($job.sourceIds) {
             $job.sourceIds = $includeIds
         } else {
-            $job.sourceIds = [System.Collections.ArrayList]::new()
-            $job.sourceIds = $includeIds
+            $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value $includeIds
         }
     }
 
@@ -229,8 +228,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         if ($job.excludeSourceIds) {
             $job.excludeSourceIds = $excludeIds
         } else {
-            $job.excludeSourceIds = [System.Collections.ArrayList]::new()
-            $job.excludeSourceIds = $excludeIds
+            $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value $excludeIds
         }
     }
 
