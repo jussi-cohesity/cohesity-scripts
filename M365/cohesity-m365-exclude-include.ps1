@@ -83,7 +83,7 @@ if ($excludeAds) {
     Write-Host "    Getting users from AD(s): $($excludeAds)" -ForegroundColor Yellow
 
     foreach ($excludeAd in $excludeAds) {
-        $users = Get-ADUser -server $excludeAd -Properties EmailAddress | Select EmailAddress
+        $users = Get-ADUser -server $excludeAd -Filter * -Properties EmailAddress | Select EmailAddress
 
         foreach ($user in $users)
         {
@@ -99,7 +99,7 @@ if ($includeAds) {
     Write-Host "    Getting users from AD(s): $($includeAds)" -ForegroundColor Yellow
 
     foreach ($includeAd in $includeAds) {
-        $users = Get-ADUser -server $includeAd -Properties EmailAddress | Select EmailAddress
+        $users = Get-ADUser -server $includeAd -Filter * -Properties EmailAddress | Select EmailAddress
 
         foreach ($user in $users)
         {
