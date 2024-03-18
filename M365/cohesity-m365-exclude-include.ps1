@@ -40,16 +40,13 @@ if (!$source) {
 if ($refreshandwait) {
 
     Write-Host "Refreshing source $protectionSource. This could take long. Please wait!" -ForegroundColor Yellow
-    ### Get source & Refresh source
-   
-    $lastRefresh = $source.registrationInfo.refreshTimeUsecs
     try {
         Update-CohesityProtectionSource -Id $($source.protectionSource.id)
     } catch {
         Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
     }
     Write-Host "Source $protectionSource refreshed. Sleeping for $waitTimeSecs seconds" -ForegroundColor Yellow
-    Start-Sleep -s $waitTimeSecs
+    Start-Sleep -s $refreshandwait
 }
 
 Write-Host "Getting all available objects for source $($protectionSource)" -ForegroundColor Yellow
