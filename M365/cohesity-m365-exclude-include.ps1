@@ -7,7 +7,7 @@ param (
     [Parameter(Mandatory = $True)][string]$cohesityCluster,
     [Parameter(Mandatory = $True)][string]$protectionSource, 
     [Parameter(Mandatory = $True)][string]$protectionGroup,
-    [Parameter(Mandatory = $False)][string]$refreshandwait,
+    [Parameter(Mandatory = $False)][string]$refreshAndWait,
     [Parameter(Mandatory = $False)][array]$excludeAdGroups,
     [Parameter(Mandatory = $False)][array]$includeAdGroups,
     [Parameter(Mandatory = $False)][array]$excludeAds,
