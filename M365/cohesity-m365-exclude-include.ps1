@@ -50,6 +50,20 @@ Start-Sleep -s $waitTimeSecs
 
 Write-Host "Getting all available objects for source $($protectionSource)" -ForegroundColor Yellow
 $allAvailableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) }
+$availableUsers = @{}
+$availableSites = @{}
+
+foreach ($availableUser in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' })) {
+    $emailAddress = $availableUser.office365ProtectionSource.primarySMTPAddress
+    $userId = $availableUser.id
+    $availableUsers.Add($emailAddress, $userId)
+}
+
+foreach ($availableSite in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' })) {
+    $siteId = $availableSite.id
+    $site = $availableSite.office365ProtectionSource.name
+    $availableSites.Add($site, $siteId)
+}
 
 
 $includeDefined = $False
@@ -68,8 +82,7 @@ if ($excludeAds) {
 
         foreach ($user in $users)
         {
-            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $excludeIds.Add($userId) | out-null
+            $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
         }
     }
 }
@@ -85,8 +98,7 @@ if ($includeAds) {
 
         foreach ($user in $users)
         {
-            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $includeIds.Add($userId) | out-null
+            $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
         }
     }
     
@@ -103,8 +115,7 @@ if ($excludeAdGroups) {
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
-            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $excludeIds.Add($userId) | out-null
+            $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
         }
     }
 }
@@ -136,8 +147,7 @@ if ($includeAdGroups) {
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
-            $userId = ($allAvailableObjects | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($user.EmailAddress) }).id
-            $includeIds.Add($userId) | out-null
+            $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
         }
     }
 }
