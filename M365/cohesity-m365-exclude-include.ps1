@@ -45,7 +45,7 @@ if ($refreshandwait) {
     } catch {
         Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
     }
-    Write-Host "Source $protectionSource refreshed. Sleeping for $waitTimeSecs seconds" -ForegroundColor Yellow
+    Write-Host "Source $protectionSource refreshed. Sleeping for $refreshAndWait seconds" -ForegroundColor Yellow
     Start-Sleep -s $refreshandwait
 }
 
