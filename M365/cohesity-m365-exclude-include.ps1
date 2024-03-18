@@ -126,7 +126,7 @@ if ($excludeSMTPdomains) {
     Write-Host "    Getting users for domain(s): $($excludeSMTPdomains)" -ForegroundColor Yellow
     
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
-        $users = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
+        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
 
         foreach ($user in $users) {
             $excludeIds.Add($user.id) | out-null
@@ -159,7 +159,7 @@ if ($includeSMTPdomains) {
     Write-Host "    Getting users from domain(s): $($includeSMTPdomains)" -ForegroundColor Yellow
 
     foreach ($includeSMTPdomain in $includeSMTPdomains) {
-        $users = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
+        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
 
         foreach ($user in $users) {
             $includeIds.Add($user.id) | out-null
@@ -174,7 +174,7 @@ if ($includeSites) {
     Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor
 
     foreach ($includeSite in $includeSites) {
-        $site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
         $includeIds.Add($site.id) | out-null
     }
 
@@ -187,7 +187,7 @@ if ($excludeSites) {
     Write-Host "    Getting IDs for site(s): $($excludeSites)" -ForegroundColor Yellow
 
     foreach ($excludeSite in $excludeSites) {
-        $site = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
+        $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
         $excludeIds.Add($site.id) | out-null
     }
 
@@ -200,7 +200,7 @@ if ($includeTeams) {
     Write-Host "    Getting IDs for teams(s): $($includeTeams)" -ForegroundColor
 
     foreach ($includeTeam in $includeTeams) {
-        $teams = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
+        $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
         $includeIds.Add($teams.id) | out-null
     }
 
@@ -213,7 +213,7 @@ if ($excludeTeams) {
     Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor
 
     foreach ($includeTeam in $includeTeams) {
-        $teams = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) } | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
+        $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
         $excludeIds.Add($teams.id) | out-null
     }
     
