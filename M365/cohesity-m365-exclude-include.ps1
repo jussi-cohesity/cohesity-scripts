@@ -62,13 +62,13 @@ foreach ($availableUser in ($allAvailableObjects | Where { $_.office365Protectio
     }
 }
 
-foreach ($availableSite in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' })) {
-    $siteId = $availableSite.id
-    $site = $availableSite.office365ProtectionSource.name
-    if ($site) {
-        $availableSites.Add($site, $siteId)
-    }
-}
+## foreach ($availableSite in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' })) {
+##    $siteId = $availableSite.id
+##    $site = $availableSite.office365ProtectionSource.name
+##    if ($site) {
+##        $availableSites.Add($site, $siteId)
+##    }
+## }
 
 
 $includeDefined = $False
