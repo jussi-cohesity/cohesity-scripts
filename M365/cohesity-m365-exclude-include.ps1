@@ -17,7 +17,8 @@ param (
     [Parameter(Mandatory = $False)][array]$includeSites,
     [Parameter(Mandatory = $False)][array]$excludeSites,
     [Parameter(Mandatory = $False)][array]$includeTeams,
-    [Parameter(Mandatory = $False)][array]$excludeTeams
+    [Parameter(Mandatory = $False)][array]$excludeTeams,
+    [Parameter(Mandatory = $False)][string]$debugOnly
 
     )
 
@@ -261,12 +262,19 @@ if (($includeDefined) -or ($excludeDefined)) {
         }
     }
 
-    try { 
-        Set-CohesityProtectionJob -ProtectionJob $job -Confirm:$false     
-    } catch {
-        write-host "Cannot update protectiongroup $protectionGroup" -ForegroundColor Red
-        exit
-    }         
+    if (!$debugOnly) {
+        Set-CohesityProtectionJob -ProtectionJob $job -Confirm:$false 
+    } else {
+        Write-host "Debug enabled. Dumping variables to json only!" -ForegroundColor Yellow
+    
+        $job | ConvertTo-Json -depth 15 | Out-file job.json
+        $includeIds | ConvertTo-Json -depth 15 | Out-file includeIds.json
+        $excludeIds | ConvertTo-Json -depth 15 | Out-File excludeIds.json
+        $source | Convertto-Json -depth 15 | Out-File source.json
+        $allAvailableObjects | ConvertTo-Json -depth 15 | Out-File allAvailableObjects.json
+        $availableUsers | ConvertTo-Json -depth 15 | Out-File availableUsers.json
+    }
+      
 } else {
     Write-Host "No include or exclude defined. Please check!" -ForegroundColor Red
     exit
