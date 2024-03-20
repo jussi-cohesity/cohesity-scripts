@@ -18,7 +18,7 @@ param (
     [Parameter(Mandatory = $False)][array]$excludeSites,
     [Parameter(Mandatory = $False)][array]$includeTeams,
     [Parameter(Mandatory = $False)][array]$excludeTeams,
-    [Parameter(Mandatory = $False)][string]$debugOnly
+    [Parameter(Mandatory = $False)][switch]$debugOnly
 
     )
 
