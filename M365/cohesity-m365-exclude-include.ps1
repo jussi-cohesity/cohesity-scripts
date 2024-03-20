@@ -65,13 +65,6 @@ foreach ($availableUser in ($allAvailableObjects | Where { $_.office365Protectio
     }
 }
 
-## foreach ($availableSite in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' })) {
-##    $siteId = $availableSite.id
-##    $site = $availableSite.office365ProtectionSource.name
-##    if ($site) {
-##        $availableSites.Add($site, $siteId)
-##    }
-## }
 
 
 $includeDefined = $False
@@ -79,6 +72,8 @@ $excludeDefined = $False
 
 $excludeIds = [System.Collections.ArrayList]::new()
 $includeIds = [System.Collections.ArrayList]::new()
+$includeDomainUsers = [System.Collections.ArrayList]::new()
+$excludeDomainUsers = [System.Collections.ArrayList]::new()
 
 if ($excludeAds) {
     $excludeDefined = $True
@@ -91,8 +86,13 @@ if ($excludeAds) {
         foreach ($user in $users)
         {
             if ($user.EmailAddress) {
-                if ($availableUsers[$user.EmailAddress.ToString()]) {
-                    $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+
+                if ($excludeSMTPdomains) {
+                    $excludeDomainUsers.Add($user.EmailAddress) | out-null
+                } else {
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                    }
                 }
             }
         }
@@ -111,8 +111,12 @@ if ($includeAds) {
         foreach ($user in $users)
         {
             if ($user.EmailAddress) {
-                if ($availableUsers[$user.EmailAddress.ToString()]) {
-                    $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                if ($includeSMTPdomains) {
+                    $includeDomainUsers.Add($user.EmailAddress) | out-null
+                } else {
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                    }
                 }
             }
         }
@@ -132,8 +136,12 @@ if ($excludeAdGroups) {
     
         foreach ($user in $users) {
             if ($user.EmailAddress) {
-                if ($availableUsers[$user.EmailAddress.ToString()]) {
-                    $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                if ($excludeSMTPdomains) {
+                    $excludeDomainUsers.Add($user.EmailAddress) | out-null
+                } else {
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                    }
                 }
             }
         }
@@ -146,12 +154,19 @@ if ($excludeSMTPdomains) {
     Write-Host "    Getting users for domain(s): $($excludeSMTPdomains)" -ForegroundColor Yellow
     
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
-        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
-
-        foreach ($user in $users) {
-            $excludeIds.Add($user.id) | out-null
+        if ($excludeDomainUsers) {
+            foreach ($excludeDomainUser in $excludeDomainUsers) {
+                $userId = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeDomainUser) }
+                $excludeIds.Add($userId) | out-null
+            }
+        } else {
+        
+            $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
+    
+            foreach ($user in $users) {
+                $excludeIds.Add($user.id) | out-null
+            }
         }
-
     }
 }
 
@@ -167,7 +182,11 @@ if ($includeAdGroups) {
         $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
     
         foreach ($user in $users) {
-            $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            if ($includeSMTPdomains) {
+                    $includeDomainUsers.Add($user.EmailAddress) | out-null
+            } else {
+                $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+            }
         }
     }
 }
@@ -179,10 +198,17 @@ if ($includeSMTPdomains) {
     Write-Host "    Getting users from domain(s): $($includeSMTPdomains)" -ForegroundColor Yellow
 
     foreach ($includeSMTPdomain in $includeSMTPdomains) {
-        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
-
-        foreach ($user in $users) {
-            $includeIds.Add($user.id) | out-null
+        if ($includeDomainUsers) {
+            foreach ($includeDomainUser in $includeDomainUsers) {
+                $userId = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeDomainUser) }
+                $includeIds.Add($userId) | out-null
+            }
+        } else {
+            $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
+    
+            foreach ($user in $users) {
+                $includeIds.Add($user.id) | out-null
+            }
         }
     }
 }
@@ -247,7 +273,7 @@ if (($includeDefined) -or ($excludeDefined)) {
     if ($includeIds) {
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
-            $job.sourceIds = $includeIds
+            $job.sourceIds = $includeIds | Sort | Get-Unique
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value $includeIds
         }
@@ -256,7 +282,7 @@ if (($includeDefined) -or ($excludeDefined)) {
     if ($excludeIds) {
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
         if ($job.excludeSourceIds) {
-            $job.excludeSourceIds = $excludeIds
+            $job.excludeSourceIds = $excludeIds | Sort | Get-Unique
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value $excludeIds
         }
