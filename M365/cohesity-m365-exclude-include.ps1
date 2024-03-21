@@ -156,7 +156,7 @@ if ($excludeSMTPdomains) {
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
         if ($excludeDomainUsers) {
             foreach ($excludeDomainUser in $excludeDomainUsers) {
-                $userId = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeDomainUser) }
+                $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeDomainUser) }).id
                 if ($userId) {
                     $excludeIds.Add($userId) | out-null
                 }
@@ -202,7 +202,7 @@ if ($includeSMTPdomains) {
     foreach ($includeSMTPdomain in $includeSMTPdomains) {
         if ($includeDomainUsers) {
             foreach ($includeDomainUser in $includeDomainUsers) {
-                $userId = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeDomainUser) }
+                $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeDomainUser) }).id
                 if ($userId) { 
                     $includeIds.Add($userId) | out-null
                 } 
