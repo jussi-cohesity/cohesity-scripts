@@ -279,7 +279,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         if ($job.sourceIds) {
             $job.sourceIds = $includeIds | Sort | Get-Unique
         } else {
-            $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value $includeIds
+            $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value ($includeIds | Sort | Get-Unique)
         }
     }
 
@@ -288,7 +288,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         if ($job.excludeSourceIds) {
             $job.excludeSourceIds = $excludeIds | Sort | Get-Unique
         } else {
-            $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value $excludeIds
+            $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value ($excludeIds | Sort | Get-Unique)
         }
     }
 
