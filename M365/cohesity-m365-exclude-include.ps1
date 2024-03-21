@@ -303,6 +303,8 @@ if (($includeDefined) -or ($excludeDefined)) {
         $source | Convertto-Json -depth 15 | Out-File source.json
         $allAvailableObjects | ConvertTo-Json -depth 15 | Out-File allAvailableObjects.json
         $availableUsers | ConvertTo-Json -depth 15 | Out-File availableUsers.json
+        $includeDomainUsers | ConvertTo-Json -depth 15 | Out-File includeDomainUsers.json
+        $excludeDomainUsers | ConvertTo-Json -depth 15 | Out-File excludeDomainUsers.json
     }
       
 } else {
