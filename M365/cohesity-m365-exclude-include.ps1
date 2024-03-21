@@ -24,10 +24,6 @@ param (
     )
     
 $logFileName = "run-" + $(Get-Date -Format "dd_mm_yyyy_HH_mm") + "_log.txt"
-Function logMessage([String]$Message)
-{
-    Add-Content -Path $logFileName $Message
-}
 
 Function logMessage()
 {
