@@ -44,13 +44,13 @@ Function logMessage()
  
 Get-Module -ListAvailable -Name Cohesity* | Import-Module
 
-if ($loggingEnabled) { logMesssage "Starting run" }
+if ($loggingEnabled) { logMessage "Starting run" }
 Write-Host "Connecting to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
 
 try {
     Connect-CohesityCluster -Server $cohesityCluster -APIkey $apiKey
     Write-Host "Connected to Cohesity Cluster $($cohesityCluster)" -ForegroundColor Yellow
-    if ($loggingEnabled) { logMesssage "Connected to Cohesity Cluster $($cohesityCluster)" }
+    if ($loggingEnabled) { logMessage "Connected to Cohesity Cluster $($cohesityCluster)" }
 } catch {
     write-host "Cannot connect to Cohesity cluster $($cohesityCluster)" -ForegroundColor Red
     exit
@@ -64,30 +64,30 @@ if ($refreshandwait) {
 
     Write-Host "Refreshing source $protectionSource. This could take long. Please wait!" -ForegroundColor Yellow
     try {
-        if ($loggingEnabled) { logMesssage "Starting to refresh source" }
+        if ($loggingEnabled) { logMessage "Starting to refresh source" }
         Update-CohesityProtectionSource -Id $($source.protectionSource.id)
     } catch {
         Write-Host "Couldn't refresh the source $($source.protectionSource.name)!" -ForegroundColor Red
     }
     Write-Host "Source $protectionSource refreshed. Sleeping for $refreshAndWait seconds" -ForegroundColor Yellow
-    if ($loggingEnabled) { logMesssage "Source refreshed" }
+    if ($loggingEnabled) { logMessage "Source refreshed" }
     Start-Sleep -s $refreshandwait
 }
 
-if ($loggingEnabled) { logMesssage "Collecting all available objects for source $($protectionSource)" }
+if ($loggingEnabled) { logMessage "Collecting all available objects for source $($protectionSource)" }
 Write-Host "Getting all available objects for source $($protectionSource)" -ForegroundColor Yellow
 $allAvailableObjects = Get-CohesityProtectionSourceObject -Environments kO365 | Where { $_.parentId -match $($source.protectionSource.id) }
 $availableUsers = @{}
 $availableSites = @{}
 
-if ($loggingEnabled) { logMesssage "Collecting allAvailableObjects" }
+if ($loggingEnabled) { logMessage "Collecting allAvailableObjects" }
 foreach ($availableUser in ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' })) {
     $emailAddress = $availableUser.office365ProtectionSource.primarySMTPAddress
     if ($emailAddress) {
         if (!$availableUsers[$emailAddress]) {
             $userId = $availableUser.id
             $availableUsers.Add($emailAddress, $userId)
-            if ($loggingEnabled) { logMesssage "    User $emailAddress added" }
+            if ($loggingEnabled) { logMessage "    User $emailAddress added" }
         }
     }
 }
@@ -104,7 +104,7 @@ $excludeDomainUsers = [System.Collections.ArrayList]::new()
 
 if ($excludeAds) {
     $excludeDefined = $True
-    if ($loggingEnabled) { logMesssage "Exclude AD(s) defined, getting users from AD(s)" }
+    if ($loggingEnabled) { logMessage "Exclude AD(s) defined, getting users from AD(s)" }
     Write-Host "Exclude AD(s) defined" -ForegroundColor Yellow
     Write-Host "    Getting users from AD(s): $($excludeAds)" -ForegroundColor Yellow
 
@@ -117,11 +117,11 @@ if ($excludeAds) {
 
                 if ($excludeSMTPdomains) {
                     $excludeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeDomainUsers" }
+                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
                         $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
-                        if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeIds" }
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
             }
@@ -131,7 +131,7 @@ if ($excludeAds) {
 
 if ($includeAds) {
     $includeDefined = $True
-    if ($loggingEnabled) { logMesssage "Include AD(s) defined, getting users from AD(s)" }
+    if ($loggingEnabled) { logMessage "Include AD(s) defined, getting users from AD(s)" }
     Write-Host "Include AD(s) defined" -ForegroundColor Yellow
     Write-Host "    Getting users from AD(s): $($includeAds)" -ForegroundColor Yellow
 
@@ -143,11 +143,11 @@ if ($includeAds) {
             if ($user.EmailAddress) {
                 if ($includeSMTPdomains) {
                     $includeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to includeDomainUsers" }
+                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
                         $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
-                        if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to includeIds" }
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
                     }
                 }
             }
@@ -158,7 +158,7 @@ if ($includeAds) {
 
 if ($excludeAdGroups) {
     $exludeDefined = $True
-    if ($loggingEnabled) { logMesssage "Exclude AD groups defined, collecting users from AD group(s)" }
+    if ($loggingEnabled) { logMessage "Exclude AD groups defined, collecting users from AD group(s)" }
     Write-Host "Exclude AD groups defined" -ForegroundColor Yellow
     Write-Host "    Getting users from AD group(s): $($excludeAdGroups)" -ForegroundColor Yellow
 
@@ -171,11 +171,11 @@ if ($excludeAdGroups) {
             if ($user.EmailAddress) {
                 if ($excludeSMTPdomains) {
                     $excludeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeDomainUsers" }
+                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
                         $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
-                        if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeIds" }
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
             }
@@ -185,7 +185,7 @@ if ($excludeAdGroups) {
 
 if ($excludeSMTPdomains) {
     $excludeDefined = $True
-    if ($loggingEnabled) { logMesssage "Exclude SMTP domains defined" }
+    if ($loggingEnabled) { logMessage "Exclude SMTP domains defined" }
     Write-Host "Exclude SMTP domains defined" -ForegroundColor Yellow
     Write-Host "    Getting users for domain(s): $($excludeSMTPdomains)" -ForegroundColor Yellow
     
@@ -195,7 +195,7 @@ if ($excludeSMTPdomains) {
                 $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeDomainUser) }).id
                 if ($userId) {
                     $excludeIds.Add($userId) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($excludeDomainUser) to excludeIds" }
+                    if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
                 }
             }
         } else {
@@ -204,7 +204,7 @@ if ($excludeSMTPdomains) {
     
             foreach ($user in $users) {
                 $excludeIds.Add($user.id) | out-null
-                if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeIds" }
+                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
             }
         }
     }
@@ -212,7 +212,7 @@ if ($excludeSMTPdomains) {
 
 if ($includeAdGroups) {
     $includeDefined = $True
-    if ($loggingEnabled) { logMesssage "Include AD groups defined, collecting users from AD group(s)" }
+    if ($loggingEnabled) { logMessage "Include AD groups defined, collecting users from AD group(s)" }
     Write-Host "Include AD groups defined" -ForegroundColor Yellow
     Write-Host "    Getting users from AD group(s): $($includeAdGroups)" -ForegroundColor Yellow
 
@@ -224,10 +224,10 @@ if ($includeAdGroups) {
         foreach ($user in $users) {
             if ($includeSMTPdomains) {
                     $includeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($user.emailAddress) to includeDomainUsers" }
+                    if ($loggingEnabled) { logMessage "    Added $($user.emailAddress) to includeDomainUsers" }
             } else {
                 $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
-                if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to excludeIds" }
+                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
             }
         }
     }
@@ -236,7 +236,7 @@ if ($includeAdGroups) {
 if ($includeSMTPdomains) {
     $includeDefined = $True
 
-    if ($loggingEnabled) { logMesssage "Include SMTP domains defined, collecting users from domain(s)" }
+    if ($loggingEnabled) { logMessage "Include SMTP domains defined, collecting users from domain(s)" }
     Write-Host "Include SMTP domains defined" -ForegroundColor Yellow
     Write-Host "    Getting users from domain(s): $($includeSMTPdomains)" -ForegroundColor Yellow
 
@@ -246,7 +246,7 @@ if ($includeSMTPdomains) {
                 $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeDomainUser) }).id
                 if ($userId) { 
                     $includeIds.Add($userId) | out-null
-                    if ($loggingEnabled) { logMesssage "    Added $($includeDomainUser) to includeIds" }
+                    if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
                 } 
             }
         } else {
@@ -254,7 +254,7 @@ if ($includeSMTPdomains) {
     
             foreach ($user in $users) {
                 $includeIds.Add($user.id) | out-null
-                if ($loggingEnabled) { logMesssage "    Added $($user.EmailAddress) to includeIds" }
+                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
             }
         }
     }
@@ -263,14 +263,14 @@ if ($includeSMTPdomains) {
 if ($includeSites) {
     $includeDefined = $True
 
-    if ($loggingEnabled) { logMesssage "Include sites defined" }
+    if ($loggingEnabled) { logMessage "Include sites defined" }
     Write-Host "Including sites defined" -ForegroundColor Yellow
     Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor
 
     foreach ($includeSite in $includeSites) {
         $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
         $includeIds.Add($site.id) | out-null
-        if ($loggingEnabled) { logMesssage "    Added $($site.id) to includeIds" }
+        if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
     }
 
 }
@@ -278,14 +278,14 @@ if ($includeSites) {
 if ($excludeSites) {
     $excludeDefined = $True
 
-    if ($loggingEnabled) { logMesssage "Exclude sites defined" }
+    if ($loggingEnabled) { logMessage "Exclude sites defined" }
     Write-Host "Excluding sites defined" -ForegroundColor Yellow
     Write-Host "    Getting IDs for site(s): $($excludeSites)" -ForegroundColor Yellow
 
     foreach ($excludeSite in $excludeSites) {
         $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
         $excludeIds.Add($site.id) | out-null
-        if ($loggingEnabled) { logMesssage "    Added $($site.id) to excludeIds" }
+        if ($loggingEnabled) { logMessage "    Added $($site.id) to excludeIds" }
     }
 
 }
@@ -293,14 +293,14 @@ if ($excludeSites) {
 if ($includeTeams) {
     $includeDefined = $True
 
-    if ($loggingEnabled) { logMesssage "Include teams defined" }
+    if ($loggingEnabled) { logMessage "Include teams defined" }
     Write-Host "Including teams defined" -ForegroundColor Yellow
     Write-Host "    Getting IDs for teams(s): $($includeTeams)" -ForegroundColor
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
         $includeIds.Add($teams.id) | out-null
-        if ($loggingEnabled) { logMesssage "    Added $($teams.id) to includeIds" }
+        if ($loggingEnabled) { logMessage "    Added $($teams.id) to includeIds" }
     }
 
 }
@@ -308,55 +308,55 @@ if ($includeTeams) {
 if ($excludeTeams) {
     $excludeDefined = $True
 
-    if ($loggingEnabled) { logMesssage "Exclude teams defined" }
+    if ($loggingEnabled) { logMessage "Exclude teams defined" }
     Write-Host "Excluding teams defined" -ForegroundColor Yellow
     Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
         $excludeIds.Add($teams.id) | out-null
-        if ($loggingEnabled) { logMesssage "    Added $($teams.id) to excludeIds" }
+        if ($loggingEnabled) { logMessage "    Added $($teams.id) to excludeIds" }
     }
     
 }
 
 if (($includeDefined) -or ($excludeDefined)) {
-    if ($loggingEnabled) { logMesssage "Getting information for ProtectionGroup $protectionGroup" }
+    if ($loggingEnabled) { logMessage "Getting information for ProtectionGroup $protectionGroup" }
     Write-Host "Getting information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     $job = Get-CohesityProtectionJob -Names $protectionGroup
-    if ($loggingEnabled) { logMesssage "ProtectionGroup details collected" }
+    if ($loggingEnabled) { logMessage "ProtectionGroup details collected" }
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     
     if ($includeIds) {
-        if ($loggingEnabled) { logMesssage "Including $($includeIds.count) objects" }
+        if ($loggingEnabled) { logMessage "Including $($includeIds.count) objects" }
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
             $job.sourceIds = $includeIds | Sort | Get-Unique
-            if ($loggingEnabled) { logMesssage "Job includeIds updated" }
+            if ($loggingEnabled) { logMessage "Job includeIds updated" }
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value ($includeIds | Sort | Get-Unique)
-            if ($loggingEnabled) { logMesssage "Job includeId added" }
+            if ($loggingEnabled) { logMessage "Job includeId added" }
         }
     }
 
     if ($excludeIds) {
-        if ($loggingEnabled) { logMesssage "Excluding $($excludeIds.count) objects" }
+        if ($loggingEnabled) { logMessage "Excluding $($excludeIds.count) objects" }
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
         if ($job.excludeSourceIds) {
             $job.excludeSourceIds = $excludeIds | Sort | Get-Unique
-            if ($loggingEnabled) { logMesssage "Job excludeIds updated" }
+            if ($loggingEnabled) { logMessage "Job excludeIds updated" }
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value ($excludeIds | Sort | Get-Unique)
-            if ($loggingEnabled) { logMesssage "Job excludeIds added" }
+            if ($loggingEnabled) { logMessage "Job excludeIds added" }
         }
     }
 
     if (!$debugOnly) {
-        if ($loggingEnabled) { logMesssage "Updating job to cluster" }
+        if ($loggingEnabled) { logMessage "Updating job to cluster" }
         Set-CohesityProtectionJob -ProtectionJob $job -Confirm:$false 
-        if ($loggingEnabled) { logMesssage "Job updated" }
+        if ($loggingEnabled) { logMessage "Job updated" }
     } else {
-        if ($loggingEnabled) { logMesssage "Debug enabled, no actual job run but exporting JSONs" }
+        if ($loggingEnabled) { logMessage "Debug enabled, no actual job run but exporting JSONs" }
         Write-host "Debug enabled. Dumping variables to json only!" -ForegroundColor Yellow
     
         $job | ConvertTo-Json -depth 15 | Out-file job.json
@@ -367,11 +367,11 @@ if (($includeDefined) -or ($excludeDefined)) {
         $availableUsers | ConvertTo-Json -depth 15 | Out-File availableUsers.json
         $includeDomainUsers | ConvertTo-Json -depth 15 | Out-File includeDomainUsers.json
         $excludeDomainUsers | ConvertTo-Json -depth 15 | Out-File excludeDomainUsers.json
-        if ($loggingEnabled) { logMesssage "JSONs exported!" }
+        if ($loggingEnabled) { logMessage "JSONs exported!" }
     }
       
 } else {
-    if ($loggingEnabled) { logMesssage "No include or exclude defined, quitting!" }
+    if ($loggingEnabled) { logMessage "No include or exclude defined, quitting!" }
     Write-Host "No include or exclude defined. Please check!" -ForegroundColor Red
     exit
 }
