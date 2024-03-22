@@ -192,7 +192,7 @@ if ($excludeSMTPdomains) {
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
         if ($excludeDomainUsers) {
             foreach ($excludeDomainUser in $excludeDomainUsers) {
-                $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeDomainUser) }).id
+                $userId = $availableUsers[$excludeDomainUser]
                 if ($userId) {
                     $excludeIds.Add($userId) | out-null
                     if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
@@ -243,7 +243,7 @@ if ($includeSMTPdomains) {
     foreach ($includeSMTPdomain in $includeSMTPdomains) {
         if ($includeDomainUsers) {
             foreach ($includeDomainUser in $includeDomainUsers) {
-                $userId = ($allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeDomainUser) }).id
+                $userId = $availableUsers[$includeDomainUser]
                 if ($userId) { 
                     $includeIds.Add($userId) | out-null
                     if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
