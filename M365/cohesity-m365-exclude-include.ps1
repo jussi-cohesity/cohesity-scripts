@@ -199,9 +199,10 @@ if ($excludeSMTPdomains) {
                 }
             }
         } else {
-        
+            if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
             $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
-    
+            if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
+            
             foreach ($user in $users) {
                 $excludeIds.Add($user.id) | out-null
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
@@ -250,8 +251,10 @@ if ($includeSMTPdomains) {
                 } 
             }
         } else {
+            if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
             $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
-    
+            if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
+            
             foreach ($user in $users) {
                 $includeIds.Add($user.id) | out-null
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
