@@ -191,7 +191,7 @@ if ($excludeSMTPdomains) {
     
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
         if ($excludeDomainUsers) {
-            foreach ($excludeDomainUser in $excludeDomainUsers) {
+            foreach ($excludeDomainUser in ($excludeDomainUsers | Where { $_ -match $excludeSMTPdomain })) {
                 $userId = $availableUsers[$excludeDomainUser]
                 if ($userId) {
                     $excludeIds.Add($userId) | out-null
@@ -243,7 +243,7 @@ if ($includeSMTPdomains) {
 
     foreach ($includeSMTPdomain in $includeSMTPdomains) {
         if ($includeDomainUsers) {
-            foreach ($includeDomainUser in $includeDomainUsers) {
+            foreach ($includeDomainUser in ($includeDomainUsers | Where { $_ -match $includeSMTPdomain })) {
                 $userId = $availableUsers[$includeDomainUser]
                 if ($userId) { 
                     $includeIds.Add($userId) | out-null
