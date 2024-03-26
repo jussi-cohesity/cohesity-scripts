@@ -163,10 +163,13 @@ if ($excludeAdGroups) {
     Write-Host "    Getting users from AD group(s): $($excludeAdGroups)" -ForegroundColor Yellow
 
     foreach ($excludeAdGroup in $excludeAdGroups) {
-        $adGroup = $excludeAdGroup -split "@"[0]
-        $adDomain = $excludeAdGroup -split "@"[1]
-        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
-    
+        if ($excludeAdGroup -match "@") {
+            $adGroup = $excludeAdGroup -split "@"[0]
+            $adDomain = $excludeAdGroup -split "@"[1]
+            $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        } else {
+            $users = Get-ADGroupMember -identity $adGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        }
         foreach ($user in $users) {
             if ($user.EmailAddress) {
                 if ($excludeSMTPdomains) {
@@ -190,10 +193,13 @@ if ($includeAdGroups) {
     Write-Host "    Getting users from AD group(s): $($includeAdGroups)" -ForegroundColor Yellow
 
     foreach ($includeAdGroup in $includeAdGroups) {
-        $adGroup = $includeAdGroup -split "@"[0]
-        $adDomain = $includeAdGroup -split "@"[1]
-        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
-    
+        if ($includeAdGroup -match "@") {
+            $adGroup = $includeAdGroup -split "@"[0]
+            $adDomain = $includeAdGroup -split "@"[1]
+            $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        } else {
+            $users = Get-ADGroupMember -identity $adGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+        }
         foreach ($user in $users) {
             if ($includeSMTPdomains) {
                     $includeDomainUsers.Add($user.EmailAddress) | out-null
