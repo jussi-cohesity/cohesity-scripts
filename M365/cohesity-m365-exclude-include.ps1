@@ -168,7 +168,7 @@ if ($excludeAdGroups) {
             $adDomain = $excludeAdGroup -split "@"[1]
             $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         } else {
-            $users = Get-ADGroupMember -identity $adGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
         foreach ($user in $users) {
             if ($user.EmailAddress) {
@@ -198,7 +198,7 @@ if ($includeAdGroups) {
             $adDomain = $includeAdGroup -split "@"[1]
             $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         } else {
-            $users = Get-ADGroupMember -identity $adGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
         foreach ($user in $users) {
             if ($includeSMTPdomains) {
