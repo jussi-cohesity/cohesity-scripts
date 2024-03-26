@@ -183,6 +183,29 @@ if ($excludeAdGroups) {
     }
 }
 
+if ($includeAdGroups) {
+    $includeDefined = $True
+    if ($loggingEnabled) { logMessage "Include AD groups defined, collecting users from AD group(s)" }
+    Write-Host "Include AD groups defined" -ForegroundColor Yellow
+    Write-Host "    Getting users from AD group(s): $($includeAdGroups)" -ForegroundColor Yellow
+
+    foreach ($includeAdGroup in $includeAdGroups) {
+        $adGroup = $includeAdGroup -split "@"[0]
+        $adDomain = $includeAdGroup -split "@"[1]
+        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+    
+        foreach ($user in $users) {
+            if ($includeSMTPdomains) {
+                    $includeDomainUsers.Add($user.EmailAddress) | out-null
+                    if ($loggingEnabled) { logMessage "    Added $($user.emailAddress) to includeDomainUsers" }
+            } else {
+                $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
+            }
+        }
+    }
+}
+
 if ($excludeSMTPdomains) {
     $excludeDefined = $True
     if ($loggingEnabled) { logMessage "Exclude SMTP domains defined" }
@@ -205,29 +228,6 @@ if ($excludeSMTPdomains) {
             
             foreach ($user in $users) {
                 $excludeIds.Add($user.id) | out-null
-                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
-            }
-        }
-    }
-}
-
-if ($includeAdGroups) {
-    $includeDefined = $True
-    if ($loggingEnabled) { logMessage "Include AD groups defined, collecting users from AD group(s)" }
-    Write-Host "Include AD groups defined" -ForegroundColor Yellow
-    Write-Host "    Getting users from AD group(s): $($includeAdGroups)" -ForegroundColor Yellow
-
-    foreach ($includeAdGroup in $includeAdGroups) {
-        $adGroup = $includeAdGroup -split "@"[0]
-        $adDomain = $includeAdGroup -split "@"[1]
-        $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
-    
-        foreach ($user in $users) {
-            if ($includeSMTPdomains) {
-                    $includeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMessage "    Added $($user.emailAddress) to includeDomainUsers" }
-            } else {
-                $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
             }
         }
