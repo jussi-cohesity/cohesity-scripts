@@ -103,8 +103,8 @@ foreach ($availableUser in ($allAvailableObjects | Where { $_.office365Protectio
 $includeDefined = $False
 $excludeDefined = $False
 
-$excludeIds = [System.Collections.ArrayList]::new()
-$includeIds = [System.Collections.ArrayList]::new()
+$excludeIds = @()
+$includeIds = @()
 $includeDomainUsers = [System.Collections.ArrayList]::new()
 $excludeDomainUsers = [System.Collections.ArrayList]::new()
 
@@ -126,7 +126,7 @@ if ($excludeAds) {
                     if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
-                        $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                        $excludeIds += ($availableUsers[$user.EmailAddress])
                         if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
@@ -152,7 +152,7 @@ if ($includeAds) {
                     if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
-                        $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                        $includeIds += ($availableUsers[$user.EmailAddress])
                         if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
                     }
                 }
@@ -183,7 +183,7 @@ if ($excludeAdGroups) {
                     if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
                 } else {
                     if ($availableUsers[$user.EmailAddress.ToString()]) {
-                        $excludeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                        $excludeIds += ($availableUsers[$user.EmailAddress])
                         if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
@@ -211,7 +211,7 @@ if ($includeAdGroups) {
                     $includeDomainUsers.Add($user.EmailAddress) | out-null
                     if ($loggingEnabled) { logMessage "    Added $($user.emailAddress) to includeDomainUsers" }
             } else {
-                $includeIds.Add(($availableUsers[$user.EmailAddress])) | out-null
+                $includeIds += ($availableUsers[$user.EmailAddress])
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
             }
         }
@@ -229,7 +229,7 @@ if ($excludeSMTPdomains) {
             foreach ($excludeDomainUser in ($excludeDomainUsers | Where { $_ -match $excludeSMTPdomain })) {
                 $userId = $availableUsers[$excludeDomainUser]
                 if ($userId) {
-                    $excludeIds.Add($userId) | out-null
+                    $excludeIds += ($userId)
                     if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
                 }
             }
@@ -239,7 +239,7 @@ if ($excludeSMTPdomains) {
             if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
             
             foreach ($user in $users) {
-                $excludeIds.Add($user.id) | out-null
+                $excludeIds += ($user.id) 
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
             }
         }
@@ -258,7 +258,7 @@ if ($includeSMTPdomains) {
             foreach ($includeDomainUser in ($includeDomainUsers | Where { $_ -match $includeSMTPdomain })) {
                 $userId = $availableUsers[$includeDomainUser]
                 if ($userId) { 
-                    $includeIds.Add($userId) | out-null
+                    $includeIds += ($userId) 
                     if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
                 } 
             }
@@ -268,7 +268,7 @@ if ($includeSMTPdomains) {
             if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
             
             foreach ($user in $users) {
-                $includeIds.Add($user.id) | out-null
+                $includeIds += ($user.id) 
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
             }
         }
@@ -284,7 +284,7 @@ if ($includeSites) {
 
     foreach ($includeSite in $includeSites) {
         $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
-        $includeIds.Add($site.id) | out-null
+        $includeIds += ($site.id) 
         if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
     }
 
@@ -299,7 +299,7 @@ if ($excludeSites) {
 
     foreach ($excludeSite in $excludeSites) {
         $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
-        $excludeIds.Add($site.id) | out-null
+        $excludeIds += ($site.id)
         if ($loggingEnabled) { logMessage "    Added $($site.id) to excludeIds" }
     }
 
@@ -314,7 +314,7 @@ if ($includeTeams) {
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
-        $includeIds.Add($teams.id) | out-null
+        $includeIds += ($teams.id)
         if ($loggingEnabled) { logMessage "    Added $($teams.id) to includeIds" }
     }
 
@@ -329,7 +329,7 @@ if ($excludeTeams) {
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
-        $excludeIds.Add($teams.id) | out-null
+        $excludeIds += ($teams.id)
         if ($loggingEnabled) { logMessage "    Added $($teams.id) to excludeIds" }
     }
     
