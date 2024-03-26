@@ -103,8 +103,8 @@ foreach ($availableUser in ($allAvailableObjects | Where { $_.office365Protectio
 $includeDefined = $False
 $excludeDefined = $False
 
-$excludeIds = [System.Collections.ArrayList]::new()
-$includeIds = [System.Collections.ArrayList]::new()
+$excludeIds = @()
+$includeIds = @()
 $includeDomainUsers = [System.Collections.ArrayList]::new()
 $excludeDomainUsers = [System.Collections.ArrayList]::new()
 
