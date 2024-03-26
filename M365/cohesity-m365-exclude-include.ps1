@@ -343,7 +343,8 @@ if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     
     if ($includeIds) {
-        $includeIds = ($includeIds | Sort | Get-Unique)
+        $includeIds = ($includeIds | Sort | Get-Unique | Where-Object { $excludeIds -notcontains $_ })
+        
         if ($loggingEnabled) { logMessage "Including $($includeIds.count) objects" }
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
