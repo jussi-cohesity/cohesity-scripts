@@ -331,25 +331,27 @@ if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     
     if ($includeIds) {
+        $includeIds = ($includeIds | Sort | Get-Unique)
         if ($loggingEnabled) { logMessage "Including $($includeIds.count) objects" }
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
-            $job.sourceIds = $includeIds | Sort | Get-Unique
+            $job.sourceIds = $includeIds
             if ($loggingEnabled) { logMessage "Job includeIds updated" }
         } else {
-            $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value ($includeIds | Sort | Get-Unique)
+            $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value ($includeIds)
             if ($loggingEnabled) { logMessage "Job includeId added" }
         }
     }
 
     if ($excludeIds) {
+        $excludeIds = ($excludeIds | Sort | Get-Unique)
         if ($loggingEnabled) { logMessage "Excluding $($excludeIds.count) objects" }
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
         if ($job.excludeSourceIds) {
-            $job.excludeSourceIds = $excludeIds | Sort | Get-Unique
+            $job.excludeSourceIds = $excludeIds
             if ($loggingEnabled) { logMessage "Job excludeIds updated" }
         } else {
-            $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value ($excludeIds | Sort | Get-Unique)
+            $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value ($excludeIds)
             if ($loggingEnabled) { logMessage "Job excludeIds added" }
         }
     }
