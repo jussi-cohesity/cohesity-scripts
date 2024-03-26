@@ -1,5 +1,11 @@
 ### Example script include/exclude users with ADgroups, users with smtp-domains, sites or teams for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
 
+###
+### refreshAndWait = Enable source refresh and wait refresh (seconds)
+### excludeAdGroups/includeAdGroups = Select which AD groups to be used (group@domain or just group)
+### excludeAds/includeAds = Select all users from ADs
+### excludeSMTPdomains/includeSMTPdomains = Filter only users matching SMTP domain (@domain)
+
 ### process commandline arguments
 [CmdletBinding()]
 param (
