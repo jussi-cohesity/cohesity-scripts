@@ -2,9 +2,10 @@
 
 ###
 ### refreshAndWait = Enable source refresh and wait refresh (seconds)
-### excludeAdGroups/includeAdGroups = Select which AD groups to be used (group@domain or just group)
+### excludeAdGroups/includeAdGroups = Select which AD groups to be used as source (group@domain or just group)
 ### excludeAds/includeAds = Select all users from ADs
 ### excludeSMTPdomains/includeSMTPdomains = Filter only users matching SMTP domain (@domain)
+### oneDriveOnly = Only look users with oneDrive enabled
 
 ### process commandline arguments
 [CmdletBinding()]
