@@ -312,7 +312,7 @@ if ($includeSMTPdomains) {
                 if ($oneDriveOnly) {
                     $userId = $availableOnedriveUsers[$includeDomainUser]
                     if ($userId) {
-                        $excludeIds += ($userId)
+                        $includeIds += ($userId)
                         if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
                     }
                 } else {
