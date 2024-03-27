@@ -94,7 +94,7 @@ foreach ($availableUser in ($allAvailableObjects | Where { $_.office365Protectio
         if (!$availableUsers[$emailAddress]) {
             $userId = $availableUser.id
 
-            if $availableUser.office365ProtectionSource.userInfo.isMailboxEnabled -eq $True) {
+            if ($availableUser.office365ProtectionSource.userInfo.isMailboxEnabled -eq $True) {
                 $availableUsers.Add($emailAddress, $userId)
                 if ($loggingEnabled) { logMessage "    User $emailAddress has Exchange enabled. Adding." }
             }
