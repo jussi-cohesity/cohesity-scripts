@@ -310,10 +310,10 @@ if ($includeSMTPdomains) {
         if ($includeDomainUsers) {
             foreach ($includeDomainUser in ($includeDomainUsers | Where { $_ -match $includeSMTPdomain })) {
                 if ($oneDriveOnly) {
-                    $userId = $availableOnedriveUsers[$excludeDomainUser]
+                    $userId = $availableOnedriveUsers[$includeDomainUser]
                     if ($userId) {
                         $excludeIds += ($userId)
-                        if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
+                        if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
                     }
                 } else {
                     $userId = $availableUsers[$includeDomainUser]
