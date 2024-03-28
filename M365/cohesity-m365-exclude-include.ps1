@@ -350,9 +350,11 @@ if ($includeSites) {
     Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor Yellow
 
     foreach ($includeSite in $includeSites) {
-        $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
-        $includeIds += ($site.id) 
-        if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
+        $sites = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
+        foreach ($site in $sites)
+            $includeIds += ($site.id) 
+            if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
+        }
     }
 
 }
@@ -380,9 +382,11 @@ if ($excludeSites) {
     Write-Host "    Getting IDs for site(s): $($excludeSites)" -ForegroundColor Yellow
 
     foreach ($excludeSite in $excludeSites) {
-        $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
-        $excludeIds += ($site.id)
-        if ($loggingEnabled) { logMessage "    Added $($site.id) to excludeIds" }
+        $sites = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($excludeSite) }
+        foreach ($site in $sites) {
+            $excludeIds += ($site.id)
+            if ($loggingEnabled) { logMessage "    Added $($site.id) to excludeIds" }
+        }
     }
 
 }
@@ -396,8 +400,10 @@ if ($includeTeams) {
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
-        $includeIds += ($teams.id)
-        if ($loggingEnabled) { logMessage "    Added $($teams.id) to includeIds" }
+        foreach ($team in $teams) {
+            $includeIds += ($team.id)
+            if ($loggingEnabled) { logMessage "    Added $($team.id) to includeIds" }
+        }
     }
 }
 
@@ -425,8 +431,10 @@ if ($excludeTeams) {
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
-        $excludeIds += ($teams.id)
-        if ($loggingEnabled) { logMessage "    Added $($teams.id) to excludeIds" }
+        foreach ($team in $teams) {
+            $excludeIds += ($team.id)
+            if ($loggingEnabled) { logMessage "    Added $($team.id) to excludeIds" }
+        }
     }
     
 }
