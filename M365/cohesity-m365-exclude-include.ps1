@@ -22,8 +22,10 @@ param (
     [Parameter(Mandatory = $False)][array]$excludeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSites,
+    [Parameter(Mandatory = $False)][switch]$includeAllSites,
     [Parameter(Mandatory = $False)][array]$excludeSites,
     [Parameter(Mandatory = $False)][array]$includeTeams,
+    [Parameter(Mandatory = $False)][switch]$includeAllTeams,
     [Parameter(Mandatory = $False)][array]$excludeTeams,
     [Parameter(Mandatory = $False)][switch]$oneDriveOnly,
     [Parameter(Mandatory = $False)][switch]$debugOnly,
@@ -345,7 +347,7 @@ if ($includeSites) {
 
     if ($loggingEnabled) { logMessage "Include sites defined" }
     Write-Host "Including sites defined" -ForegroundColor Yellow
-    Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor
+    Write-Host "    Getting IDs for site(s): $($includeSites)" -ForegroundColor Yellow
 
     foreach ($includeSite in $includeSites) {
         $site = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
@@ -353,6 +355,21 @@ if ($includeSites) {
         if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
     }
 
+}
+
+if ($includeAllSites) {
+    $includeDefined = $True
+
+    if ($loggingEnabled) { logMessage "Include all sites defined" }
+    Write-Host "Including all sites defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for all sites" -ForegroundColor Yellow
+
+    $sites = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' }
+
+    foreach ($site in $sites) {
+        $includeIds += ($site.id)
+        if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
+    }
 }
 
 if ($excludeSites) {
@@ -375,14 +392,28 @@ if ($includeTeams) {
 
     if ($loggingEnabled) { logMessage "Include teams defined" }
     Write-Host "Including teams defined" -ForegroundColor Yellow
-    Write-Host "    Getting IDs for teams(s): $($includeTeams)" -ForegroundColor
+    Write-Host "    Getting IDs for teams(s): $($includeTeams)" -ForegroundColor Yellow
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($includeTeam) }
         $includeIds += ($teams.id)
         if ($loggingEnabled) { logMessage "    Added $($teams.id) to includeIds" }
     }
+}
 
+if ($includeAllTeams) {
+    $includeDefined = $True
+
+    if ($loggingEnabled) { logMessage "Include all teams defined" }
+    Write-Host "Including all teams defined" -ForegroundColor Yellow
+    Write-Host "    Getting IDs for all teams(s)" -ForegroundColor Yellow
+
+    $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' }
+
+    foreach ($team in $teams) {
+        $includeIds += ($team.id)
+        if ($loggingEnabled) { logMessage "    Added $($team.id) to includeIds" }
+    }
 }
 
 if ($excludeTeams) {
@@ -390,7 +421,7 @@ if ($excludeTeams) {
 
     if ($loggingEnabled) { logMessage "Exclude teams defined" }
     Write-Host "Excluding teams defined" -ForegroundColor Yellow
-    Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor
+    Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor Yellow
 
     foreach ($includeTeam in $includeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
