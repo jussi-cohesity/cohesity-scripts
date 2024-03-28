@@ -351,7 +351,7 @@ if ($includeSites) {
 
     foreach ($includeSite in $includeSites) {
         $sites = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kSite' } | Where { $_.office365ProtectionSource.name -match $($includeSite) }
-        foreach ($site in $sites)
+        foreach ($site in $sites) {
             $includeIds += ($site.id) 
             if ($loggingEnabled) { logMessage "    Added $($site.id) to includeIds" }
         }
