@@ -442,7 +442,13 @@ if ($excludeTeams) {
 if (($includeDefined) -or ($excludeDefined)) {
     if ($loggingEnabled) { logMessage "Getting information for ProtectionGroup $protectionGroup" }
     Write-Host "Getting information for ProtectionGroup $protectionGroup" -ForegroundColor Yellow
-    $job = Get-CohesityProtectionJob -Names $protectionGroup
+    $job = Get-CohesityProtectionJob | Where { $_.name -eq $protectionGroup }
+    if (!$job) {
+        Write-Host "Failed to get ProtectionGroup $protectionGroup. Please check!" -ForegroundColor Red
+        if ($loggingEnabled) { logMessage "Failed to get ProtectionGroup $protectionGroup" }
+        exit
+    }
+    
     if ($loggingEnabled) { logMessage "ProtectionGroup details collected" }
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     
