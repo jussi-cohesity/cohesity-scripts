@@ -429,7 +429,7 @@ if ($excludeTeams) {
     Write-Host "Excluding teams defined" -ForegroundColor Yellow
     Write-Host "    Getting IDs for teams(s): $($excludeTeams)" -ForegroundColor Yellow
 
-    foreach ($includeTeam in $includeTeams) {
+    foreach ($excludeTeam in $excludeTeams) {
         $teams = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kTeam' } | Where { $_.office365ProtectionSource.name -match $($excludeTeam) }
         foreach ($team in $teams) {
             $excludeIds += ($team.id)
