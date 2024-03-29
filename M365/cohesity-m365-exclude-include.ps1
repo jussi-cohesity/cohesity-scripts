@@ -35,8 +35,7 @@ param (
 
     )
     
-$logFileName = "run-" + $(Get-Date -Format "dd_mm_yyyy_HH_mm") + "_log.txt"
-
+-
 Function logMessage()
 {
  param
@@ -47,7 +46,7 @@ Function logMessage()
     Try {
         $TimeStamp = (Get-Date).toString("dd.MM.yyyy HH:mm:ss")
         $Line = "$TimeStamp - $Message"
-        Add-content -Path $logFileName -Value $Line
+        $Line | Out-File -Filepath $logFileName -Append
     }
     Catch {
         Write-host -f Red "Error:" $_.Exception.Message
