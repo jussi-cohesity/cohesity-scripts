@@ -128,6 +128,7 @@ if ($oneDriveOnly) {
 
 if ($includeAllUsers) {
     $includeDefined = $True
+    if ($loggingEnabled) { logMessage "All users selected. Adding!" }
 
     if ($oneDriveOnly) {
         foreach ($availableOnedriveUser in $availableOnedriveUsers.keys) {
