@@ -21,6 +21,7 @@ param (
     [Parameter(Mandatory = $False)][array]$includeAds,
     [Parameter(Mandatory = $False)][array]$excludeSMTPdomains,
     [Parameter(Mandatory = $False)][array]$includeSMTPdomains,
+    [Parameter(Mandatory = $False)][switch]$includeAllUsers,
     [Parameter(Mandatory = $False)][array]$includeSites,
     [Parameter(Mandatory = $False)][switch]$includeAllSites,
     [Parameter(Mandatory = $False)][array]$excludeSites,
@@ -123,6 +124,22 @@ $excludeDomainUsers = [System.Collections.ArrayList]::new()
 if ($oneDriveOnly) { 
     Write-Host "OneDrive defined" -ForegroundColor Yellow 
     if ($loggingEnabled) { logMessage "OneDrive defined" }
+}
+
+if ($includeAllUsers) {
+    $includeDefined = $True
+
+    if ($oneDriveOnly) {
+        foreach ($availableOnedriveUser in $availableOnedriveUsers.keys) {
+            $includeIds += $availableOnedriveUsers[$availableOnedriveUser]
+            if ($loggingEnabled) { logMessage "    Added OneDriveUser $($availableOnedriveUsers[$availableOnedriveUser]) to includeIds" }
+        }
+    } else {
+        foreach ($availableUser in $availableUsers.keys) {
+            $includeIds += $availableUsers[$availableUser]
+            if ($loggingEnabled) { logMessage "    Added ExchangeUser $($availableUsers[$availableUser]) to includeIds" }
+        }
+    }
 }
 
 if ($excludeAds) {
