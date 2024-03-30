@@ -471,8 +471,12 @@ if (($includeDefined) -or ($excludeDefined)) {
     Write-Host "Updating ProtectionGroup $protectionGroup" -ForegroundColor Yellow
     
     if ($includeIds) {
-        if ($excludeIds) { $excludeIds = ($excludeIds | Sort | Get-Unique) }
-        $includeIds = ($includeIds | Sort | Get-Unique | Where-Object { $excludeIds -notcontains $_ })
+        if ($excludeIds) { 
+            $excludeIds = ($excludeIds | Sort | Get-Unique) 
+            $includeIds = ($includeIds | Sort | Get-Unique | Where-Object { $excludeIds -notcontains $_ })
+        } else {
+            $includeIds = ($includeIds | Sort | Get-Unique
+        }
         
         if ($loggingEnabled) { logMessage "Including $($includeIds.count) objects" }
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
