@@ -1,4 +1,4 @@
-### Example script include/exclude users with ADgroups, users with smtp-domains, sites or teams for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
+$### Example script include/exclude users with ADgroups, users with smtp-domains, sites or teams for M365 protection group - Jussi Jaurola <jussi@cohesity.com>
 
 ###
 ### refreshAndWait = Enable source refresh and wait refresh (seconds)
@@ -476,7 +476,7 @@ if (($includeDefined) -or ($excludeDefined)) {
             $excludeIds = ($excludeIds | Sort | Get-Unique) 
             $includeIds = ($includeIds | Sort | Get-Unique | Where-Object { $excludeIds -notcontains $_ })
         } else {
-            $includeIds = ($includeIds | Sort | Get-Unique
+            $includeIds = ($includeIds | Sort | Get-Unique)
         }
         
         if ($loggingEnabled) { logMessage "Including $($includeIds.count) objects" }
