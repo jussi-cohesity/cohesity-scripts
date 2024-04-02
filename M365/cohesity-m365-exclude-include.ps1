@@ -488,8 +488,8 @@ if (($includeDefined) -or ($excludeDefined)) {
         $allAvailableObjects | ConvertTo-Json -depth 15 | Out-File allAvailableObjects.json
         $availableUsers | ConvertTo-Json -depth 15 | Out-File availableUsers.json
         $availableOnedriveUsers | ConvertTo-Json -depth 15 | Out-File availableOnedriveUsers.json
-        $includeDomainUsers | ConvertTo-Json -depth 15 | Out-File includeDomainUsers.json
-        $excludeDomainUsers | ConvertTo-Json -depth 15 | Out-File excludeDomainUsers.json
+        $includedUsers | ConvertTo-Json -depth 15 | Out-File includedUsers.json
+        $excludedUsers | ConvertTo-Json -depth 15 | Out-File excludedUsers.json
         if ($loggingEnabled) { logMessage "JSONs exported!" }
     }
       
