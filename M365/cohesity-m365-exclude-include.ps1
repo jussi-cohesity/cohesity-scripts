@@ -156,21 +156,15 @@ if ($excludeAds) {
         foreach ($user in $users)
         {
             if ($user.EmailAddress) {
-
-                if ($excludeSMTPdomains) {
-                    $excludeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
+                if ($oneDriveOnly) {
+                    if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds += ($availableOnedriveUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to excludeIds" }
+                    }
                 } else {
-                    if ($oneDriveOnly) {
-                        if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                            $excludeIds += ($availableOnedriveUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to excludeIds" }
-                        }
-                    } else {
-                        if ($availableUsers[$user.EmailAddress.ToString()]) {
-                            $excludeIds += ($availableUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
-                        }
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds += ($availableUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
             }
@@ -190,26 +184,20 @@ if ($includeAds) {
         foreach ($user in $users)
         {
             if ($user.EmailAddress) {
-                if ($includeSMTPdomains) {
-                    $includeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeDomainUsers" }
+                if ($oneDriveOnly) {
+                    if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
+                        $includeIds += ($availableOnedriveUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includeIds" }
+                    }
                 } else {
-                    if ($oneDriveOnly) {
-                        if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                            $includeIds += ($availableOnedriveUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includeIds" }
-                        }
-                    } else {
-                        if ($availableUsers[$user.EmailAddress.ToString()]) {
-                            $includeIds += ($availableUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
-                        }
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $includeIds += ($availableUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
                     }
                 }
             }
         }
     }
-    
 }
 
 if ($excludeAdGroups) {
@@ -228,20 +216,15 @@ if ($excludeAdGroups) {
         }
         foreach ($user in $users) {
             if ($user.EmailAddress) {
-                if ($excludeSMTPdomains) {
-                    $excludeDomainUsers.Add($user.EmailAddress) | out-null
-                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeDomainUsers" }
+                if ($oneDriveOnly) {
+                    if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds += ($availableOnedriveUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to excludeIds" }
+                    }
                 } else {
-                    if ($oneDriveOnly) {
-                        if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                            $excludeIds += ($availableOnedriveUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to excludeIds" }
-                        }
-                    } else {
-                        if ($availableUsers[$user.EmailAddress.ToString()]) {
-                            $excludeIds += ($availableUsers[$user.EmailAddress])
-                            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
-                        }
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        $excludeIds += ($availableUsers[$user.EmailAddress])
+                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
                     }
                 }
             }
@@ -264,98 +247,14 @@ if ($includeAdGroups) {
             $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
         foreach ($user in $users) {
-            if ($includeSMTPdomains) {
-                $includeDomainUsers.Add($user.EmailAddress) | out-null
-                if ($loggingEnabled) { logMessage "    Added $($user.emailAddress) to includeDomainUsers" }
+            if ($oneDriveOnly) {
+                if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
+                    $includeIds += ($availableOnedriveUsers[$user.EmailAddress])
+                    if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includeIds" }
+                }
             } else {
-                if ($oneDriveOnly) {
-                    if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                        $includeIds += ($availableOnedriveUsers[$user.EmailAddress])
-                        if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includeIds" }
-                    }
-                } else {
-                    $includeIds += ($availableUsers[$user.EmailAddress])
-                    if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
-                }
-            }
-        }
-    }
-}
-
-if ($excludeSMTPdomains) {
-    $excludeDefined = $True
-    if ($loggingEnabled) { logMessage "Exclude SMTP domains defined" }
-    Write-Host "Exclude SMTP domains defined" -ForegroundColor Yellow
-    Write-Host "    Getting users for domain(s): $($excludeSMTPdomains)" -ForegroundColor Yellow
-    
-    foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
-        if ($excludeDomainUsers) {
-            foreach ($excludeDomainUser in ($excludeDomainUsers | Where { $_ -match $excludeSMTPdomain })) {
-                if ($oneDriveOnly) {
-                    $userId = $availableOnedriveUsers[$excludeDomainUser]
-                    if ($userId) {
-                        $excludeIds += ($userId)
-                        if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
-                    }
-                } else {
-                    $userId = $availableUsers[$excludeDomainUser]
-                    if ($userId) {
-                        $excludeIds += ($userId)
-                        if ($loggingEnabled) { logMessage "    Added $($excludeDomainUser) to excludeIds" }
-                    }
-                }
-            }
-        } else {
-            if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
-            $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
-            if ($oneDriveOnly) {
-                $users = $users | Where { $_.office365ProtectionSource.userInfo.isOneDriveEnabled -eq $True }
-            }
-            if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
-            
-            foreach ($user in $users) {
-                $excludeIds += ($user.id) 
+                $includeIds += ($availableUsers[$user.EmailAddress])
                 if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
-            }
-        }
-    }
-}
-
-if ($includeSMTPdomains) {
-    $includeDefined = $True
-
-    if ($loggingEnabled) { logMessage "Include SMTP domains defined, collecting users from domain(s)" }
-    Write-Host "Include SMTP domains defined" -ForegroundColor Yellow
-    Write-Host "    Getting users from domain(s): $($includeSMTPdomains)" -ForegroundColor Yellow
-
-    foreach ($includeSMTPdomain in $includeSMTPdomains) {
-        if ($includeDomainUsers) {
-            foreach ($includeDomainUser in ($includeDomainUsers | Where { $_ -match $includeSMTPdomain })) {
-                if ($oneDriveOnly) {
-                    $userId = $availableOnedriveUsers[$includeDomainUser]
-                    if ($userId) {
-                        $includeIds += ($userId)
-                        if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
-                    }
-                } else {
-                    $userId = $availableUsers[$includeDomainUser]
-                    if ($userId) { 
-                        $includeIds += ($userId) 
-                        if ($loggingEnabled) { logMessage "    Added $($includeDomainUser) to includeIds" }
-                    }  
-                }
-            }
-        } else {
-            if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
-            $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
-            if ($oneDriveOnly) {
-                $users = $users | Where { $_.office365ProtectionSource.userInfo.isOneDriveEnabled -eq $True }
-            }
-            if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
-            
-            foreach ($user in $users) {
-                $includeIds += ($user.id) 
-                if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
             }
         }
     }
@@ -457,6 +356,50 @@ if ($excludeTeams) {
     }
     
 }
+
+if ($excludeSMTPdomains) {
+    $excludeDefined = $True
+    if ($loggingEnabled) { logMessage "Exclude SMTP domains defined" }
+    Write-Host "Exclude SMTP domains defined" -ForegroundColor Yellow
+    Write-Host "    Getting users for domain(s): $($excludeSMTPdomains)" -ForegroundColor Yellow
+    
+    foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
+        if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
+        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($excludeSMTPdomain) }
+        if ($oneDriveOnly) {
+            $users = $users | Where { $_.office365ProtectionSource.userInfo.isOneDriveEnabled -eq $True }
+        }
+        if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
+            
+        foreach ($user in $users) {
+            $excludeIds += ($user.id) 
+            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to excludeIds" }
+        } 
+    }
+}
+
+if ($includeSMTPdomains) {
+    $includeDefined = $True
+
+    if ($loggingEnabled) { logMessage "Include SMTP domains defined, collecting users from domain(s)" }
+    Write-Host "Include SMTP domains defined" -ForegroundColor Yellow
+    Write-Host "    Getting users from domain(s): $($includeSMTPdomains)" -ForegroundColor Yellow
+
+    foreach ($includeSMTPdomain in $includeSMTPdomains) {
+       if ($loggingEnabled) { logMessage "Filtering users with $excludeSMTPdomain" }
+        $users = $allAvailableObjects | Where { $_.office365ProtectionSource.type -eq 'kUser' } | Where { $_.office365ProtectionSource.primarySMTPAddress -match $($includeSMTPdomain) }
+        if ($oneDriveOnly) {
+            $users = $users | Where { $_.office365ProtectionSource.userInfo.isOneDriveEnabled -eq $True }
+        }
+        if ($loggingEnabled) { logMessage "    Found $($users.count) users matching domain $excludeSMTPdomain" }
+            
+        foreach ($user in $users) {
+            $includeIds += ($user.id) 
+            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includeIds" }
+        }
+    }
+}
+
 
 if (($includeDefined) -or ($excludeDefined)) {
     if ($loggingEnabled) { logMessage "Getting information for ProtectionGroup $protectionGroup" }
