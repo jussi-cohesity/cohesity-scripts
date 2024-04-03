@@ -231,7 +231,7 @@ if ($excludeAdGroups) {
             if ($user.EmailAddress) {
                 if ($oneDriveOnly) {
                     if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                        f (!$excludedUsers[$user.EmailAddress]) {
+                        if (!$excludedUsers[$user.EmailAddress]) {
                             $excludedUsers.Add($user.EmailAddress, $availableOnedriveUsers[$user.EmailAddress])
                             if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to excludedUsers" }
                         }   
