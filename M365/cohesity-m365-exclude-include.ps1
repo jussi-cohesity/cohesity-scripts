@@ -462,7 +462,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         if (!$includeIds) {
             $excludeIds = ($excludeIds | Sort | Get-Unique)
         }
-        if ($loggingEnabled) { logMessage "Excluding $($excludeIds.count) objects" }
+        if ($loggingEnabled) { logMessage "Excluding $($excludeIds.count) objects" }
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
         if ($job.excludeSourceIds) {
             $job.excludeSourceIds = $excludeIds
