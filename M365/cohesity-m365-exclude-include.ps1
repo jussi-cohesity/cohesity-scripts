@@ -264,18 +264,20 @@ if ($includeAdGroups) {
             $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
         foreach ($user in $users) {
-            if ($oneDriveOnly) {
-                if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
-                    if(!$includedUsers[$user.EmailAddress]) {
-                        $includedUsers.Add($user.EmailAddress, $availableOnedriveUsers[$user.EmailAddress])
-                        if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includedUsers" }
-                    }     
-                }
-            } else {
-                if ($availableUsers[$user.EmailAddress.ToString()]) {
-                    if(!$includedUsers[$user.EmailAddress]) {
-                        $includedUsers.Add($user.EmailAddress, $availableUsers[$user.EmailAddress])
-                        if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includedUsers" }
+            if ($user.EmailAddress) {
+                if ($oneDriveOnly) {
+                    if ($availableOnedriveUsers[$user.EmailAddress.ToString()]) {
+                        if(!$includedUsers[$user.EmailAddress]) {
+                            $includedUsers.Add($user.EmailAddress, $availableOnedriveUsers[$user.EmailAddress])
+                            if ($loggingEnabled) { logMessage "    Added OneDriveUser $($user.EmailAddress) to includedUsers" }
+                        }     
+                    }
+                } else {
+                    if ($availableUsers[$user.EmailAddress.ToString()]) {
+                        if(!$includedUsers[$user.EmailAddress]) {
+                            $includedUsers.Add($user.EmailAddress, $availableUsers[$user.EmailAddress])
+                            if ($loggingEnabled) { logMessage "    Added $($user.EmailAddress) to includedUsers" }
+                        }
                     }
                 }
             }
