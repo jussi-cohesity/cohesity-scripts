@@ -292,7 +292,7 @@ if ($excludeSMTPdomains) {
     foreach ($excludeSMTPdomain in $excludeSMTPdomains) {
         foreach ($excludeUser in ($includedUsers.keys | Where { $_ -match $excludeSMTPdomain})) {
             $includedUsers.Remove($excludeUser)
-            if ($loggingEnabled) { logMessage "    Reoved $($excludeUser) from includedUsers" }
+            if ($loggingEnabled) { logMessage "    Removed $($excludeUser) from includedUsers" }
         }
     }
 }
@@ -435,7 +435,7 @@ if (($includeDefined) -or ($excludeDefined)) {
 
     if ($excludedUsers) {
         foreach ($excludedUser in $excludedUsers.keys) {
-            $excludeIds += $excludedUsers[$excludeUser]
+            $excludeIds += $excludedUsers[$excludedUser]
         }
     }
     
