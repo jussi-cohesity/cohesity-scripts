@@ -451,7 +451,7 @@ if (($includeDefined) -or ($excludeDefined)) {
         Write-Host "    Including $($includeIds.count) objects" -ForegroundColor Yellow
         if ($job.sourceIds) {
             $job.sourceIds = $includeIds
-            if ($loggingEnabled) { logMessage "Job includeIds updated" }
+            if ($loggingEnabled) { logMessage "Job includeIds updated" }
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "sourceIds" -Value ($includeIds)
             if ($loggingEnabled) { logMessage "Job includeId added" }
