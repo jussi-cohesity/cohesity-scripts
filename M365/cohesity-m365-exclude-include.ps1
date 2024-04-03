@@ -466,19 +466,19 @@ if (($includeDefined) -or ($excludeDefined)) {
         Write-Host "    Excluding $($excludeIds.count) objects" -ForegroundColor Yellow
         if ($job.excludeSourceIds) {
             $job.excludeSourceIds = $excludeIds
-            if ($loggingEnabled) { logMessage "Job excludeIds updated" }
+            if ($loggingEnabled) { logMessage "Job excludeIds updated" }
         } else {
             $job | Add-Member -Membertype NoteProperty -Name "excludeSourceIds" -Value ($excludeIds)
-            if ($loggingEnabled) { logMessage "Job excludeIds added" }
+            if ($loggingEnabled) { logMessage "Job excludeIds added" }
         }
     }
 
     if (!$debugOnly) {
-        if ($loggingEnabled) { logMessage "Updating job to cluster" }
+        if ($loggingEnabled) { logMessage "Updating job to cluster" }
         Set-CohesityProtectionJob -ProtectionJob $job -Confirm:$false 
-        if ($loggingEnabled) { logMessage "Job updated" }
+        if ($loggingEnabled) { logMessage "Job updated" }
     } else {
-        if ($loggingEnabled) { logMessage "Debug enabled, no actual job run but exporting JSONs" }
+        if ($loggingEnabled) { logMessage "Debug enabled, no actual job run but exporting JSONs" }
         Write-host "Debug enabled. Dumping variables to json only!" -ForegroundColor Yellow
     
         $job | ConvertTo-Json -depth 15 | Out-file job.json
