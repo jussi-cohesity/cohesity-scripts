@@ -157,6 +157,11 @@ if ($excludeAds) {
     foreach ($excludeAd in $excludeAds) {
         $users = Get-ADUser -server $excludeAd -Filter * -Properties EmailAddress | Select EmailAddress
 
+        if ($debugOnly) {
+            $outFileName = "excludeAds_" + "$excludeAd" + "_Users.json"
+            $users | ConvertTo-Json -depth 15 | Out-File $outFileName
+        }
+        
         foreach ($user in $users)
         {
             if ($user.EmailAddress) {
@@ -188,6 +193,11 @@ if ($includeAds) {
 
     foreach ($includeAd in $includeAds) {
         $users = Get-ADUser -server $includeAd -Filter * -Properties EmailAddress | Select EmailAddress
+
+        if ($debugOnly) {
+            $outFileName = "includeAds_" + "$includeAd" + "_Users.json"
+            $users | ConvertTo-Json -depth 15 | Out-File $outFileName
+        }
 
         foreach ($user in $users)
         {
@@ -227,6 +237,12 @@ if ($excludeAdGroups) {
         } else {
             $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
+
+        if ($debugOnly) {
+            $outFileName = "excludeAdGroups_" + "$excludeAdGroup" + "_Users.json"
+            $users | ConvertTo-Json -depth 15 | Out-File $outFileName
+        }
+        
         foreach ($user in $users) {
             if ($user.EmailAddress) {
                 if ($oneDriveOnly) {
@@ -263,6 +279,12 @@ if ($includeAdGroups) {
         } else {
             $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
         }
+
+        if ($debugOnly) {
+            $outFileName = "includeAdGroups" + "$includeAdGroup" + "_Users.json"
+            $users | ConvertTo-Json -depth 15 | Out-File $outFileName
+        }
+        
         foreach ($user in $users) {
             if ($user.EmailAddress) {
                 if ($oneDriveOnly) {
