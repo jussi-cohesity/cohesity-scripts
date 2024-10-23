@@ -281,7 +281,7 @@ if ($includeAdGroups) {
         }
 
         if ($debugOnly) {
-            $outFileName = "includeAdGroups" + "$includeAdGroup" + "_Users.json"
+            $outFileName = "includeAdGroups_" + "$includeAdGroup" + "_Users.json"
             $users | ConvertTo-Json -depth 15 | Out-File $outFileName
         }
         
