@@ -155,8 +155,13 @@ if ($excludeAds) {
     Write-Host "    Getting users from AD(s): $($excludeAds)" -ForegroundColor Yellow
 
     foreach ($excludeAd in $excludeAds) {
-        $users = Get-ADUser -server $excludeAd -Filter * -Properties EmailAddress | Select EmailAddress
 
+        try {
+            $users = Get-ADUser -server $excludeAd -Filter * -Properties EmailAddress | Select EmailAddress
+         } catch {
+            write-host "Cannot get users for AD Group $($excludeAd). Please check AD connection and group max limit." -ForegroundColor Red
+            exit
+        }
         if ($debugOnly) {
             $outFileName = "excludeAds_" + "$excludeAd" + "_Users.json"
             $users | ConvertTo-Json -depth 15 | Out-File $outFileName
@@ -192,8 +197,12 @@ if ($includeAds) {
     Write-Host "    Getting users from AD(s): $($includeAds)" -ForegroundColor Yellow
 
     foreach ($includeAd in $includeAds) {
-        $users = Get-ADUser -server $includeAd -Filter * -Properties EmailAddress | Select EmailAddress
-
+        try {
+            $users = Get-ADUser -server $includeAd -Filter * -Properties EmailAddress | Select EmailAddress
+        } catch {
+            write-host "Cannot get users for AD Group $($includeAd). Please check AD connection and group max limit." -ForegroundColor Red
+            exit
+        }
         if ($debugOnly) {
             $outFileName = "includeAds_" + "$includeAd" + "_Users.json"
             $users | ConvertTo-Json -depth 15 | Out-File $outFileName
@@ -233,9 +242,19 @@ if ($excludeAdGroups) {
         if ($excludeAdGroup -match "@") {
             $adGroup = $($excludeAdGroup -split "@")[0]
             $adDomain = $($excludeAdGroup -split "@")[1]
-            $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            try {
+                $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            } catch {
+                write-host "Cannot get users for AD Group $($excludeAdGroup). Please check AD connection and group max limit." -ForegroundColor Red
+                exit
+            }    
         } else {
-            $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            try {
+                $users = Get-ADGroupMember -identity $excludeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            } catch {
+                write-host "Cannot get users for AD Group $($excludeAdGroup). Please check AD connection and group max limit." -ForegroundColor Red
+                exit
+            }
         }
 
         if ($debugOnly) {
@@ -275,9 +294,19 @@ if ($includeAdGroups) {
         if ($includeAdGroup -match "@") {
             $adGroup = $($includeAdGroup -split "@")[0]
             $adDomain = $($includeAdGroup -split "@")[1]
-            $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            try {
+                $users = Get-ADGroupMember -identity $adGroup -server $adDomain -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            } catch {
+                write-host "Cannot get users for AD Group $($includeAdGroup). Please check AD connection and group max limit." -ForegroundColor Red
+                exit
+            }
         } else {
-            $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            try {
+                $users = Get-ADGroupMember -identity $includeAdGroup -Recursive | Get-ADUser -Properties EmailAddress | Select EmailAddress
+            } catch {
+                write-host "Cannot get users for AD Group $($includeAdGroup). Please check AD connection and group max limit." -ForegroundColor Red
+                exit
+            }
         }
 
         if ($debugOnly) {
