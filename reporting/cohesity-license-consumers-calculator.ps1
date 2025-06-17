@@ -104,6 +104,6 @@ Add-Content -Path $export -Value $line
         $smartfilesUsed += $stat.stats.localDataWrittenBytes
     }
     ### write data 
-    $line = "{0},{1},{2},{3}" -f $cluster, [math]::Round($dataProtectServiceUsed/$units, 2), [math]::Round($dataProtectReplicaUsed/$units, 2), [math]::Round($smartfilesUsed/$units, 2)
+    $line = "{0},{1},{2},{3}" -f $clusterName, [math]::Round($dataProtectServiceUsed/$units, 2), [math]::Round($dataProtectReplicaUsed/$units, 2), [math]::Round($smartfilesUsed/$units, 2)
 Add-Content -Path $export -Value $line
 }
