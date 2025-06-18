@@ -5,7 +5,9 @@
 ### process commandline arguments
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $True)][string]$apikey,
+    [Parameter(Mandatory = $False)][string]$apikey,
+    [Parameter(Mandatory = $False)][string]$username,
+    [Parameter()][string]$domain = 'local',
     [Parameter()][ValidateSet('MB','GB','TB')][string]$unit = "GB",
     [Parameter(Mandatory = $False)][string]$clusterName,  
     [Parameter(Mandatory = $true)][string]$export 
@@ -17,16 +19,24 @@ param (
 
 if ($clusterName) {
 	try {
-		apiauth -vip $clusterName -useApikey -password $apikey
+ 		if ($apikey) {
+			apiauth -vip $clusterName -useApikey -password $apikey
+   		} else {
+     			apiauth -vip $clusterName -username $username -domain $domain
+     		}
 	} catch {
-    		write-host "Cannot connect to $($clusterName). Please check the apikey!" -ForegroundColor Red
+    		write-host "Cannot connect to $($clusterName). Please check the connection and authentication method" -ForegroundColor Red
     		exit
 	}
 } else { 
 	try {
-		apiauth -helios -password $apikey
+ 		if ($apikey) {
+			apiauth -helios -password $apikey
+   		} else {
+     			apiauth -helios -username $username
+		}
 	} catch {
-    		write-host "Cannot connect to Helios. Please check the apikey!" -ForegroundColor Red
+    		write-host "Cannot connect to Helios. Please check the apikey/usename!" -ForegroundColor Red
     		exit
 	}
 }
